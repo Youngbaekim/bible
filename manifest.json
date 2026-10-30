@@ -1,0 +1,38 @@
+{
+  "name": "1426 다본문 성경",
+  "short_name": "1426성경",
+  "id": "/bible/",
+  "description": "다본문 성경 읽기 앱",
+  "start_url": "/bible/",
+  "scope": "/bible/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f0e4",
+  "theme_color": "#8a6030",
+  "icons": [
+    {
+      "src": "icons/bible-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/bible-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/bible-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/bible-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

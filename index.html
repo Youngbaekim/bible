@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1426성경">
+<meta name="theme-color" content="#0e1628">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/bible-192.png">
+<link rel="apple-touch-icon" href="icons/bible-maskable-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/bible-maskable-512.png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<title>YB 1426 다본문 성경 ✦</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Sans+KR:wght@400;500;700;900&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic&family=KoPub+Dotum:wght@300;500&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f3f4f6;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── Header ── */
+#header{padding:6px 12px;border-bottom:1px solid #e5e7eb;background:#fff;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.hdr-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hdr-btns{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:nowrap}
+.hdr-row2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.header-title{font-size:16px;font-weight:900;font-family:'Noto Sans KR',sans-serif;color:#111827;white-space:nowrap;flex-shrink:1;letter-spacing:-0.3px}
+.cl{font-size:11px;color:#9ca3af;white-space:nowrap}
+.hsel{font-size:12px;padding:3px 6px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#374151;cursor:pointer;outline:none}
+#font-sel{width:72px;text-overflow:ellipsis}
+.swrap{display:flex;align-items:center;gap:2px}
+.sval{font-size:13px;font-weight:600;min-width:22px;text-align:center;color:#374151}
+.sbtn{width:22px;height:22px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#6b7280;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;padding:0;line-height:1}
+.sbtn:hover{background:#f3f4f6}
+#add-panel-btn{display:flex;align-items:center;gap:4px;padding:5px 13px;border-radius:6px;border:none;background:#4f46e5;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Noto Sans KR',sans-serif}
+#add-panel-btn:hover{background:#4338ca}
+#add-panel-btn:disabled{background:#a5b4fc;cursor:not-allowed}
+
+/* ── Panels ── */
+#panels-wrap{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;min-height:0;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+#panels-wrap::-webkit-scrollbar{height:5px}
+#panels-wrap::-webkit-scrollbar-track{background:#f3f4f6}
+#panels-wrap::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+#panels{display:flex;height:100%;width:100%}
+
+.panel{flex:1;min-width:min(460px,92vw);max-width:840px;display:flex;flex-direction:column;border-right:1px solid #e5e7eb;border-left:0 solid #e5e7eb;background:#fff;height:100%;scroll-snap-align:start}
+.panel-bar{padding:6px 8px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow-x:auto;background:#f9fafb;flex-shrink:0;position:relative}
+.panel-bar::-webkit-scrollbar{display:none}
+.panel-text{flex:1;overflow-y:auto;padding:16px 16px;-webkit-overflow-scrolling:touch}
+.panel-text::-webkit-scrollbar{width:4px}
+.panel-text::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+
+/* Bar controls */
+select,button{font-family:'Noto Sans KR',sans-serif}
+.panel-bar{justify-content:flex-start}
+.bar-sel,.book-sel{width:114px;flex:none;font-size:14px;padding:4px 6px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#374151;cursor:pointer;outline:none;flex-shrink:0}
+.arr-btn{font-size:20px;padding:3px 11px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#6b7280;cursor:pointer;line-height:1;flex-shrink:0}
+.arr-btn:hover{background:#f3f4f6}
+.ch-btn{font-size:15px;font-weight:600;min-width:36px;padding:3px 6px;border-radius:4px;border:1px solid #c7d2fe;background:#eef2ff;color:#4f46e5;cursor:pointer;line-height:1;flex-shrink:0}
+.ch-btn:hover{background:#e0e7ff}
+.close-btn{font-size:12px;padding:3px 8px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#9ca3af;cursor:pointer;margin-left:auto;flex-shrink:0}
+.close-btn:hover{background:#fee2e2;color:#ef4444}
+
+/* Chapter dropdown */
+.ch-dropdown{position:fixed;z-index:9999;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,0.18);padding:8px;display:grid;grid-template-columns:repeat(8,1fr);gap:3px;max-width:calc(100vw - 24px)}
+.ch-item{font-size:13px;padding:5px 3px;text-align:center;border-radius:4px;cursor:pointer;color:#374151;transition:all 0.1s;min-width:26px}
+.ch-item:hover{background:#eef2ff;color:#4f46e5}
+.ch-item.cur{background:#4f46e5;color:#fff;font-weight:600}
+
+/* Verses */
+.ch-label{font-size:10px;color:#9ca3af;letter-spacing:3px;margin-bottom:14px;font-family:sans-serif}
+.verse-row{display:flex;gap:9px;padding:0 5px;cursor:pointer;border-left:2px solid transparent;transition:background 0.12s}
+.verse-row:hover{background:#f5f5f5}
+.verse-row.hl{background:#fef9ec;border-left-color:#f59e0b}
+.verse-row.rtl{flex-direction:row-reverse;border-left:none;border-right:2px solid transparent}
+.verse-row.rtl.hl{border-right-color:#f59e0b;border-left:none}
+.verse-num{font-size:10px;font-weight:700;min-width:18px;color:#f59e0b;font-family:monospace;flex-shrink:0;padding-top:3px}
+.verse-body{flex:1}
+.verse-text{color:#000}
+.verse-text sup{font-size:0.7em;color:#6366f1;font-weight:700;vertical-align:super}
+.verse-text i{font-style:italic}
+.footnote{color:#555;margin-top:4px;padding-left:8px;border-left:2px solid #e5e7eb;line-height:1.6}
+.footnote sup{font-size:0.75em;color:#6366f1;font-weight:700;vertical-align:super}
+
+/* Loading / Error */
+.loading{text-align:center;padding:60px 0;color:#9ca3af;font-size:13px}
+.spinner{font-size:22px;margin-bottom:10px;display:inline-block;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-msg{color:#ef4444;font-size:13px;padding:24px;line-height:1.8;text-align:center}
+
+/* ── Dark Mode ── */
+body.dark{background:#16191d}
+body.dark #header{background:#1b1e22;border-color:#2c3137}
+body.dark .header-title{color:#d5dade}
+body.dark .hsel{background:#2c3137;border-color:#3a4048;color:#d5dade}
+body.dark .cl{color:#8a949e}
+body.dark .sval{color:#d5dade}
+body.dark .sbtn{background:#2c3137;border-color:#3a4048;color:#9aa5b0}
+body.dark .sbtn:hover{background:#3a4048}
+body.dark #panels-wrap::-webkit-scrollbar-track{background:#16191d}
+body.dark #panels-wrap::-webkit-scrollbar-thumb{background:#3a4048}
+body.dark .panel{background:#1b1e22;border-color:#2c3137}
+body.dark .panel-bar{background:#1f2328;border-color:#2c3137}
+body.dark .bar-sel,body.dark .book-sel{background:#2c3137;border-color:#3a4048;color:#d5dade}
+body.dark .arr-btn{background:#2c3137;border-color:#3a4048;color:#9aa5b0}
+body.dark .arr-btn:hover{background:#3a4048}
+body.dark .ch-btn{background:#24304a;border-color:#3d5580;color:#8fb0e6}
+body.dark .ch-btn:hover{background:#2d3b5a}
+body.dark .close-btn{background:#2c3137;border-color:#3a4048;color:#8a949e}
+body.dark .close-btn:hover{background:#7f1d1d;color:#fca5a5}
+body.dark .ch-dropdown{background:#1b1e22;border-color:#3a4048;box-shadow:0 6px 20px rgba(0,0,0,0.5)}
+body.dark .ch-item{color:#c9cfd5}
+body.dark .ch-item:hover{background:#24304a;color:#8fb0e6}
+body.dark .ch-item.cur{background:#8fb0e6;color:#10151c}
+body.dark .panel-text::-webkit-scrollbar-thumb{background:#3a4048}
+body.dark .ch-label{color:#8a949e}
+body.dark .verse-row:hover{background:#24304a}
+body.dark .verse-row.hl{background:#1c1917;border-left-color:#8fb0e6}
+body.dark .verse-row.rtl.hl{border-right-color:#8fb0e6}
+body.dark .verse-num{color:#8fb0e6}
+body.dark .verse-text{color:#d5dade !important}
+body.dark .verse-row.hl .verse-text{color:#fff !important}
+body.dark .footnote{color:#9aa5b0;border-left-color:#2c3137}
+body.dark .loading{color:#8a949e}
+body.dark .err-msg{color:#f2948f}
+#theme-btn,#auth-btn{font-size:12px;font-weight:600;padding:4px 10px;border-radius:5px;border:1px solid #d1d5db;background:#f3f4f6;color:#374151;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif}
+#theme-btn:hover,#auth-btn:hover{background:#e5e7eb}
+body.dark #theme-btn,body.dark #auth-btn{background:#2c3137;border-color:#3a4048;color:#d5dade}
+body.dark #theme-btn:hover{background:#3a4048}
+
+
+#wrap-btn,#sync-btn{font-size:12px;font-weight:600;padding:4px 10px;border-radius:5px;border:1px solid #d1d5db;background:#f3f4f6;color:#374151;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif}
+#wrap-btn:hover,#sync-btn:hover{background:#e5e7eb}
+#wrap-btn.active{background:#4f46e5;color:#fff;border-color:#4f46e5}
+body.dark #wrap-btn,body.dark #sync-btn{background:#2c3137;border-color:#3a4048;color:#d5dade}
+body.dark #wrap-btn.active{background:#8fb0e6;border-color:#8fb0e6;color:#10151c}
+body.dark #wrap-btn:hover,body.dark #sync-btn:hover{background:#3a4048}
+body.dark2 #wrap-btn,body.dark2 #sync-btn{background:#2a2f35;border-color:#3a4048;color:#c9cfd5}
+body.dark2 #wrap-btn.active{background:#8fb0e6;border-color:#8fb0e6;color:#10151c}
+body.dark2 #wrap-btn:hover,body.dark2 #sync-btn:hover{background:#343a42}
+body.bright2 #wrap-btn,body.bright2 #sync-btn{background:#f5f0e4;border-color:#c4b08a;color:#3d2b1a}
+body.bright2 #wrap-btn.active{background:#8a6030;border-color:#8a6030;color:#fff}
+body.bright2 #wrap-btn:hover,body.bright2 #sync-btn:hover{background:#ede4d0}
+#search-btn,#help-btn,#plan-btn,#more-btn{font-size:12px;font-weight:600;padding:4px 10px;border-radius:5px;border:1px solid #d1d5db;background:#f3f4f6;color:#374151;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif}
+#search-btn:hover,#help-btn:hover,#plan-btn:hover,#more-btn:hover{background:#e5e7eb}
+body.dark #search-btn,body.dark #help-btn,body.dark #plan-btn,body.dark #more-btn{background:#2c3137;border-color:#3a4048;color:#d5dade}
+body.dark #search-btn:hover,body.dark #help-btn:hover,body.dark #plan-btn:hover,body.dark #more-btn:hover{background:#3a4048}
+
+/* Search Modal */
+#search-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:flex-start;justify-content:center;padding-top:60px}
+#search-modal.open{display:flex}
+#search-box{background:#fff;border-radius:12px;width:min(560px,96vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.25);overflow:hidden}
+body.dark #search-box{background:#1b1e22;border:1px solid #2c3137}
+#search-header{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:8px;flex-shrink:0}
+body.dark #search-header{border-color:#2c3137}
+#search-trans{font-size:13px;padding:4px 8px;border-radius:4px;border:1px solid #d1d5db;background:#fff;color:#374151;outline:none;cursor:pointer}
+body.dark #search-trans{background:#2c3137;border-color:#3a4048;color:#d5dade}
+#search-input{flex:1;font-size:15px;padding:6px 10px;border-radius:6px;border:1px solid #d1d5db;outline:none;font-family:'Pretendard Variable',Pretendard,sans-serif;color:#111827}
+body.dark #search-input{background:#23272c;border-color:#3a4048;color:#d5dade}
+#search-input:focus{border-color:#6366f1}
+#search-go{padding:6px 14px;border-radius:6px;border:none;background:#4f46e5;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif}
+#search-go:hover{background:#4338ca}
+#search-close{padding:4px 8px;border-radius:6px;border:1px solid #d1d5db;background:transparent;color:#9ca3af;font-size:16px;cursor:pointer;flex-shrink:0}
+body.dark #search-close{border-color:#3a4048;color:#8a949e}
+#search-status{padding:6px 16px;font-size:12px;color:#9ca3af;flex-shrink:0;min-height:24px}
+body.dark #search-status{color:#8a949e}
+#search-results{overflow-y:auto;flex:1;padding:4px 0}
+#search-results::-webkit-scrollbar{width:4px}
+#search-results::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
+.sr-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid #f3f4f6;transition:background 0.1s}
+.sr-item:hover{background:#f9fafb}
+body.dark .sr-item{border-color:#23272c}
+body.dark .sr-item:hover{background:#24304a}
+.sr-ref{font-size:11px;font-weight:700;color:#6366f1;margin-bottom:3px;letter-spacing:0.5px}
+.sr-text{font-size:14px;color:#111827;font-family:'Pretendard Variable',Pretendard,sans-serif;line-height:1.7}
+body.dark .sr-text{color:#d5dade}
+.sr-text mark{background:#fef08a;color:#000;border-radius:2px;padding:0 1px}
+body.dark .sr-text mark{background:#854d0e;color:#fef9c3}
+.sr-none{padding:32px 16px;text-align:center;color:#9ca3af;font-size:13px}
+
+
+.copy-btn{font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid #6366f1;background:#eef2ff;color:#4f46e5;cursor:pointer;font-weight:600;flex-shrink:0;transition:all 0.15s;font-family:'Noto Sans KR',sans-serif}
+.copy-btn:hover{background:#6366f1;color:#fff}
+.copy-btn.copied{background:#22c55e;border-color:#22c55e;color:#fff}
+body.dark .copy-btn{background:#24304a;border-color:#8fb0e6;color:#8fb0e6}
+body.dark .copy-btn:hover{background:#8fb0e6;color:#10151c}
+
+
+
+/* ── Dark2 Mode (Neutral Dark Gray) ── */
+body.dark2{background:#131518}
+body.dark2 #header{background:#1b1e22;border-color:#3a4048}
+body.dark2 .header-title{color:#e8ebee}
+body.dark2 .hsel{background:#2a2f35;border-color:#3a4048;color:#c9cfd5}
+body.dark2 .cl{color:#9aa5b0}
+body.dark2 .sval{color:#c9cfd5}
+body.dark2 .sbtn{background:#2a2f35;border-color:#3a4048;color:#9aa5b0}
+body.dark2 .sbtn:hover{background:#343a42}
+body.dark2 #theme-btn,body.dark2 #search-btn,body.dark2 #help-btn,body.dark2 #plan-btn,body.dark2 #more-btn,body.dark2 #auth-btn{background:#2a2f35;border-color:#3a4048;color:#c9cfd5}
+body.dark2 #theme-btn:hover,body.dark2 #search-btn:hover,body.dark2 #help-btn:hover,body.dark2 #plan-btn:hover,body.dark2 #more-btn:hover{background:#343a42}
+body.dark2 #add-panel-btn{background:#8fb0e6;border-color:#7a9dd6}
+body.dark2 #add-panel-btn:hover{background:#7a9dd6}
+body.dark2 #panels-wrap::-webkit-scrollbar-track{background:#131518}
+body.dark2 #panels-wrap::-webkit-scrollbar-thumb{background:#4a525c}
+body.dark2 .panel{background:#23272c;border-color:#31363d}
+body.dark2 .panel-bar{background:#1b1e22;border-color:#343a42}
+body.dark2 .bar-sel,body.dark2 .book-sel{background:#2a2f35;border-color:#3a4048;color:#c9cfd5}
+body.dark2 .arr-btn{background:#2a2f35;border-color:#3a4048;color:#9aa5b0}
+body.dark2 .arr-btn:hover{background:#343a42}
+body.dark2 .ch-btn{background:#2a2f35;border-color:#8fb0e6;color:#8fb0e6;font-weight:600}
+body.dark2 .ch-btn:hover{background:#343a42}
+body.dark2 .close-btn{background:#2a2f35;border-color:#3a4048;color:#9aa5b0}
+body.dark2 .close-btn:hover{background:#5a2020;color:#f08080}
+body.dark2 .ch-dropdown{background:#1b1e22;border-color:#3a4048;box-shadow:0 6px 20px rgba(0,0,0,0.5)}
+body.dark2 .ch-item{color:#c9cfd5}
+body.dark2 .ch-item:hover{background:#343a42;color:#e8ebee}
+body.dark2 .ch-item.cur{background:#8fb0e6;color:#10151c;font-weight:600}
+body.dark2 .panel-text::-webkit-scrollbar-thumb{background:#4a525c}
+body.dark2 .ch-label{color:#7d8792;letter-spacing:3px}
+body.dark2 .verse-row:hover{background:#2a2f35}
+body.dark2 .verse-row.hl{background:#1e2d3d;border-left-color:#8fb0e6}
+body.dark2 .verse-row.rtl.hl{border-right-color:#8fb0e6;border-left:none}
+body.dark2 .verse-num{color:#8fb0e6}
+body.dark2 .verse-text{color:#d5dade !important}
+body.dark2 .verse-row.hl .verse-text{color:#f0f0f0 !important}
+body.dark2 .footnote{color:#9aa5b0;border-left-color:#343a42}
+body.dark2 .copy-btn{background:#2a2f35;border-color:#8fb0e6;color:#8fb0e6}
+body.dark2 .copy-btn:hover{background:#8fb0e6;color:#10151c}
+body.dark2 .copy-btn.copied{background:#3a8a40;border-color:#3a8a40;color:#fff}
+body.dark2 .loading{color:#7d8792}
+body.dark2 .err-msg{color:#f2948f}
+body.dark2 #search-box{background:#1b1e22;border:1px solid #3a4048}
+body.dark2 #search-header{border-color:#343a42}
+body.dark2 #search-trans{background:#2a2f35;border-color:#3a4048;color:#c9cfd5}
+body.dark2 #search-input{background:#2a2f35;border-color:#3a4048;color:#d5dade}
+body.dark2 #search-input:focus{border-color:#8fb0e6}
+body.dark2 #search-go{background:#8fb0e6;color:#10151c}
+body.dark2 #search-go:hover{background:#7a9dd6}
+body.dark2 #search-close{border-color:#3a4048;color:#9aa5b0}
+body.dark2 #search-status{color:#7d8792}
+body.dark2 .sr-item{border-color:#2a2f35}
+body.dark2 .sr-item:hover{background:#2a2f35}
+body.dark2 .sr-ref{color:#8fb0e6}
+body.dark2 .sr-text{color:#d5dade}
+body.dark2 .sr-text mark{background:#1e3a5a;color:#90d0ff}
+
+/* ── Bright2 Mode (Parchment × Sepia) ── */
+body.bright2{background:#ede4d0}
+body.bright2 #header{background:#f5f0e4;border-color:#d4c4a0}
+body.bright2 .header-title{color:#3d2b1a}
+body.bright2 .hsel{background:#f5f0e4;border-color:#c4b08a;color:#3d2b1a}
+body.bright2 .cl{color:#8a7050}
+body.bright2 .sval{color:#3d2b1a}
+body.bright2 .sbtn{background:#f5f0e4;border-color:#c4b08a;color:#6a5030}
+body.bright2 .sbtn:hover{background:#ede4d0}
+body.bright2 #theme-btn,body.bright2 #search-btn,body.bright2 #help-btn,body.bright2 #plan-btn,body.bright2 #more-btn,body.bright2 #auth-btn{background:#f5f0e4;border-color:#c4b08a;color:#3d2b1a}
+body.bright2 #theme-btn:hover,body.bright2 #search-btn:hover,body.bright2 #help-btn:hover,body.bright2 #plan-btn:hover,body.bright2 #more-btn:hover{background:#ede4d0}
+body.bright2 #add-panel-btn{background:#8a6030;border-color:#7a5020}
+body.bright2 #add-panel-btn:hover{background:#7a5020}
+body.bright2 #panels-wrap::-webkit-scrollbar-track{background:#ede4d0}
+body.bright2 #panels-wrap::-webkit-scrollbar-thumb{background:#c4b08a}
+body.bright2 .panel{background:#f8f3ea;border-color:#d4c4a0}
+body.bright2 .panel-bar{background:#f0e8d8;border-color:#d4c4a0}
+body.bright2 .bar-sel,body.bright2 .book-sel{background:#f8f3ea;border-color:#c4b08a;color:#3d2b1a}
+body.bright2 .arr-btn{background:#f5f0e4;border-color:#c4b08a;color:#6a5030}
+body.bright2 .arr-btn:hover{background:#ede4d0}
+body.bright2 .ch-btn{background:#f0e8d8;border-color:#a08050;color:#6a4020;font-weight:600}
+body.bright2 .ch-btn:hover{background:#e4d8c0}
+body.bright2 .close-btn{background:#f5f0e4;border-color:#c4b08a;color:#8a7050}
+body.bright2 .close-btn:hover{background:#f4d0c0;color:#8a2010}
+body.bright2 .ch-dropdown{background:#f8f3ea;border-color:#c4b08a;box-shadow:0 6px 20px rgba(100,70,30,0.15)}
+body.bright2 .ch-item{color:#3d2b1a}
+body.bright2 .ch-item:hover{background:#ede4d0;color:#6a4020}
+body.bright2 .ch-item.cur{background:#8a6030;color:#fff;font-weight:600}
+body.bright2 .panel-text::-webkit-scrollbar-thumb{background:#c4b08a}
+body.bright2 .ch-label{color:#8a7050;letter-spacing:3px}
+body.bright2 .verse-row:hover{background:#f0e8d8}
+body.bright2 .verse-row.hl{background:#f4e8cc;border-left-color:#a08050}
+body.bright2 .verse-row.rtl.hl{border-right-color:#a08050}
+body.bright2 .verse-num{color:#a08050}
+body.bright2 .verse-text{color:#2a1a08 !important}
+body.bright2 .verse-row.hl .verse-text{color:#1a0e04 !important}
+body.bright2 .footnote{color:#7a6040;border-left-color:#d4c4a0}
+body.bright2 .copy-btn{background:#f5f0e4;border-color:#a08050;color:#6a4020}
+body.bright2 .copy-btn:hover{background:#8a6030;color:#fff}
+body.bright2 .copy-btn.copied{background:#5a8a30;border-color:#5a8a30;color:#fff}
+body.bright2 .loading{color:#8a7050}
+body.bright2 .err-msg{color:#c04020}
+body.bright2 #search-box{background:#f8f3ea;border:1px solid #c4b08a}
+body.bright2 #search-header{border-color:#d4c4a0}
+body.bright2 #search-trans{background:#f5f0e4;border-color:#c4b08a;color:#3d2b1a}
+body.bright2 #search-input{background:#fff;border-color:#c4b08a;color:#2a1a08}
+body.bright2 #search-input:focus{border-color:#8a6030}
+body.bright2 #search-go{background:#8a6030;color:#fff}
+body.bright2 #search-go:hover{background:#7a5020}
+body.bright2 #search-close{border-color:#c4b08a;color:#8a7050}
+body.bright2 #search-status{color:#8a7050}
+body.bright2 .sr-item{border-color:#e8dcc8}
+body.bright2 .sr-item:hover{background:#f0e8d8}
+body.bright2 .sr-ref{color:#8a6030}
+body.bright2 .sr-text{color:#2a1a08}
+body.bright2 .sr-text mark{background:#f0d080;color:#3d2b1a}
+
+
+/* ── Inline Verse Layout ── */
+.sec-heading{font-weight:700;color:#111827;margin:18px 0 5px;font-size:0.95em;font-family:'Noto Sans KR',sans-serif;display:block}
+body.dark .sec-heading{color:#d5dade}
+body.dark1 .sec-heading{color:#e2e8f0}
+body.dark2 .sec-heading{color:#d5dade}
+body.bright2 .sec-heading{color:#3d2b1a}
+.verse-para{margin-bottom:14px;text-align:justify}
+.vi{cursor:pointer;border-radius:3px;transition:background 0.1s;border-left:2px solid transparent;color:#000}
+.vi:hover{background:rgba(245,158,11,0.12)}
+.vi.hl{background:#fef9ec;border-left-color:#f59e0b;color:#000}
+body.dark .vi.hl{background:#1c1917;border-left-color:#8fb0e6}
+body.dark2 .vi.hl{background:#1e2d3d;border-left-color:#8fb0e6}
+body.bright2 .vi.hl{background:#f4e8cc;border-left-color:#a08050}
+.vn{font-size:0.65em;font-weight:700;color:#f59e0b;vertical-align:super;margin-right:2px;font-family:monospace;line-height:0}
+/* 줄바꿈 모드: 절 번호를 본문 첫 줄 기준선에 맞추고 위첨자 높이만큼 올림 */
+.vi-row{display:flex;align-items:baseline;gap:8px}
+.vi-row>.vbody{flex:1;min-width:0} /* 형광펜이 글자 줄마다 끊기도록 본문은 inline span 안에 */
+.vi-row>.vn{flex-shrink:0;min-width:1.4em;text-align:right;position:relative;top:-0.45em;line-height:1;margin-right:0}
+body.dark2 .vn{color:#8fb0e6}
+.sec-footnotes{font-size:0.84em;color:#6b7280;margin:2px 0 14px;padding-left:8px;border-left:2px solid #e5e7eb;line-height:1.6}
+body.dark .sec-footnotes{color:#9aa5b0;border-left-color:#2c3137}
+body.dark2 .sec-footnotes{color:#9aa5b0;border-left-color:#343a42}
+body.bright2 .sec-footnotes{color:#7a6040;border-left-color:#d4c4a0}
+
+
+/* ── 이어쓰기 모드 다크 스타일 ── */
+body.dark .verse-para{color:#d5dade}
+body.dark .vi{color:#d5dade}
+body.dark .vi.hl{background:#1c1917 !important;color:#fff}
+body.dark2 .verse-para{color:#d5dade}
+body.dark2 .vi{color:#d5dade}
+body.dark2 .vi.hl{background:#1e2d3d !important;color:#f0f0f0}
+body.bright2 .verse-para{color:#2a1a08}
+body.bright2 .vi{color:#2a1a08}
+body.bright2 .vi.hl{background:#f4e8cc !important;color:#1a0e04}
+
+
+/* ── 복사 모드 ── */
+.cp-bar{display:none;padding:6px 10px;background:#1d4ed8;align-items:center;gap:8px;flex-shrink:0;border-bottom:1px solid #1e40af}
+.cp-bar.active{display:flex}
+.cp-label{font-size:12px;color:#fff;font-weight:600;flex:1;font-family:'Noto Sans KR',sans-serif}
+.cp-confirm{font-size:12px;font-weight:700;padding:4px 14px;border-radius:5px;border:none;background:#fff;color:#1d4ed8;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.cp-confirm:hover{background:#dbeafe}
+.cp-cancel{font-size:12px;padding:4px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.cp-cancel:hover{background:rgba(255,255,255,0.15)}
+.verse-row.cp,.vi.cp{background:#dbeafe !important;border-left-color:#3b82f6 !important}
+body.dark .verse-row.cp,body.dark .vi.cp{background:#24304a !important;border-left-color:#8fb0e6 !important}
+body.dark2 .verse-row.cp,body.dark2 .vi.cp{background:#24304a !important;border-left-color:#8fb0e6 !important}
+body.bright2 .verse-row.cp,body.bright2 .vi.cp{background:#e0f0ff !important;border-left-color:#4a90d9 !important}
+
+/* ── Mobile ── */
+@media(max-width:600px){
+  #header{padding:5px 10px;gap:3px}
+  .header-title{font-size:13px}
+  .hdr-btns{gap:4px}
+  #add-panel-btn,#search-btn,#help-btn,#plan-btn,#more-btn,#theme-btn{font-size:11px;padding:3px 7px}
+  .hsel{font-size:11px;padding:2px 5px}
+  #font-sel{width:66px}
+  #wrap-btn,#sync-btn{font-size:11px;padding:3px 7px}
+  .hdr-row2{gap:5px;flex-wrap:nowrap}
+  .sval{font-size:12px}
+  .sbtn{width:20px;height:20px;font-size:11px}
+  .panel{min-width:min(460px,100vw)}
+  .panel-text{padding:12px 12px}
+  .bar-sel,.book-sel{width:100px;font-size:13px;padding:3px 5px}
+  .arr-btn{font-size:18px;padding:3px 9px}
+  .ch-btn{font-size:14px;min-width:32px}
+  .ch-item{font-size:14px;padding:6px 2px}
+}
+
+
+/* ── 다크1·다크2: YB-EverNote 다크 팔레트 ── */
+body.dark #add-panel-btn,body.dark2 #add-panel-btn{background:#8fb0e6;border-color:#8fb0e6;color:#10151c}
+body.dark #add-panel-btn:hover,body.dark2 #add-panel-btn:hover{background:#7a9dd6}
+body.dark #search-go,body.dark2 #search-go{background:#8fb0e6;color:#10151c}
+body.dark .vn{color:#8fb0e6}
+body.dark .sr-ref{color:#8fb0e6}
+body.dark .vi:hover,body.dark .verse-row:hover{background:#24304a}
+body.dark2 .vi:hover,body.dark2 .verse-row:hover{background:#2a2f35}
+/* 형광펜: 노랑 바탕 + 진한 글씨(반대색) */
+body.dark .vi.hl,body.dark2 .vi.hl,body.dark .verse-row.hl,body.dark2 .verse-row.hl{background:#FFF176 !important;border-left-color:#e6c84a !important;color:#16202b !important}
+body.dark .verse-row.hl .verse-text,body.dark2 .verse-row.hl .verse-text{color:#16202b !important}
+body.dark .vi.hl .vn,body.dark2 .vi.hl .vn,body.dark .verse-row.hl .verse-num,body.dark2 .verse-row.hl .verse-num{color:#5a4a00}
+body.dark .sr-text mark,body.dark2 .sr-text mark{background:#FFF176;color:#16202b}
+
+
+/* ── 형광펜: 절 번호·줄 끝 여백 제외, 문장에만 ── */
+.vi.hl,body.dark .vi.hl,body.dark2 .vi.hl,body.bright2 .vi.hl{background:transparent !important;border-left-color:transparent !important}
+.vi.hl .vt{background:#fff3a3;color:#000;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+body.dark .vi.hl .vt,body.dark2 .vi.hl .vt{background:#FFF176;color:#16202b}
+body.bright2 .vi.hl .vt{background:#efdcae;color:#1a0e04}
+body.dark .vi.hl .vn,body.dark2 .vi.hl .vn{color:#8fb0e6}
+
+/* ── 연동 창 ── */
+#sync-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:flex-start;justify-content:center;padding-top:70px}
+#sync-modal.open{display:flex}
+#sync-box{background:#fff;border-radius:12px;width:min(420px,94vw);max-height:80vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,0.25);padding:14px 16px 16px;font-family:'Noto Sans KR',sans-serif;color:#111827}
+.sync-head{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:10px}
+.sync-x{border:none;background:transparent;font-size:16px;color:#9ca3af;cursor:pointer;padding:2px 6px}
+#sync-list{display:flex;flex-direction:column;gap:6px}
+.sync-item{display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;background:#f9fafb;cursor:pointer;font-family:inherit;color:inherit}
+.sync-item:hover{border-color:#4f46e5;background:#eef2ff}
+.sync-ref{font-size:15px;font-weight:700}
+.sync-tr{font-size:11px;color:#6b7280;text-align:right}
+.sync-sub{margin:14px 0 6px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:12px;font-weight:700;color:#6b7280}
+#sync-msg{font-weight:400;color:#ef4444;margin-left:6px}
+#sync-trans{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px}
+.sync-ck{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;white-space:nowrap}
+.sync-ck input{width:15px;height:15px;accent-color:#4f46e5;cursor:pointer}
+body.dark #sync-box,body.dark2 #sync-box{background:#1b1e22;border:1px solid #3a4048;color:#d5dade}
+body.dark .sync-item,body.dark2 .sync-item{background:#23272c;border-color:#3a4048}
+body.dark .sync-item:hover,body.dark2 .sync-item:hover{background:#24304a;border-color:#8fb0e6}
+body.dark .sync-tr,body.dark2 .sync-tr,body.dark .sync-sub,body.dark2 .sync-sub{color:#9aa5b0}
+body.dark .sync-sub,body.dark2 .sync-sub{border-color:#2c3137}
+body.dark .sync-ck input,body.dark2 .sync-ck input{accent-color:#8fb0e6}
+body.bright2 #sync-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
+body.bright2 .sync-item{background:#f5f0e4;border-color:#c4b08a}
+body.bright2 .sync-item:hover{background:#ede4d0;border-color:#8a6030}
+body.bright2 .sync-tr,body.bright2 .sync-sub{color:#7a6040}
+body.bright2 .sync-sub{border-color:#d4c4a0}
+body.bright2 .sync-ck input{accent-color:#8a6030}
+
+/* ── 색상 모드 선택(링크 모양) ── */
+.theme-sel{padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#6b7280;font-size:12px;cursor:pointer;outline:none;max-width:150px;font-family:'Noto Sans KR',sans-serif;flex-shrink:1;min-width:0}
+.theme-sel:hover{color:#4f46e5}
+body.dark .theme-sel,body.dark2 .theme-sel{background:#1b1e22;border-color:#2c3137;color:#9aa5b0}
+body.dark .theme-sel:hover,body.dark2 .theme-sel:hover{color:#8fb0e6}
+body.bright2 .theme-sel{background:#f8f3ea;border-color:#c4b08a;color:#7a6040}
+body.bright2 .theme-sel:hover{color:#8a6030}
+/* ── 안내 창 ── */
+#help-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:flex-start;justify-content:center;padding:50px 0 20px}
+#help-modal.open{display:flex}
+#help-box{background:#fff;border-radius:12px;width:min(560px,94vw);max-height:calc(100vh - 70px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+.help-head{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;padding:14px 16px 10px;border-bottom:1px solid #e5e7eb}
+.help-body{overflow:auto;padding:4px 16px 16px}
+.help-body h4{margin:14px 0 6px;font-size:12px;color:#4f46e5;letter-spacing:.04em}
+.help-body table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.55}
+.help-body th{width:92px;text-align:left;vertical-align:top;font-weight:700;padding:6px 8px 6px 0;white-space:nowrap}
+.help-body td{padding:6px 0;color:#374151;word-break:keep-all}
+.help-body tr+tr th,.help-body tr+tr td{border-top:1px solid #f0f1f3}
+body.dark #help-box,body.dark2 #help-box{background:#1b1e22;border:1px solid #3a4048;color:#e8ebee}
+body.dark .help-head,body.dark2 .help-head{border-color:#2c3137}
+body.dark .help-body h4,body.dark2 .help-body h4{color:#8fb0e6}
+body.dark .help-body td,body.dark2 .help-body td{color:#c9cfd5}
+body.dark .help-body tr+tr th,body.dark .help-body tr+tr td,body.dark2 .help-body tr+tr th,body.dark2 .help-body tr+tr td{border-color:#2c3137}
+body.bright2 #help-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
+body.bright2 .help-head{border-color:#d4c4a0}
+body.bright2 .help-body h4{color:#8a6030}
+body.bright2 .help-body td{color:#5a4028}
+body.bright2 .help-body tr+tr th,body.bright2 .help-body tr+tr td{border-color:#e6dac0}
+@media(max-width:600px){
+  .theme-sel{font-size:11px;padding:3px 2px;max-width:82px}
+  .hdr-row1 .header-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .hdr-btns{gap:3px}
+  #help-btn,  #plan-btn,  #more-btn,#auth-btn{font-size:11px;padding:3px 7px}
+  .help-body th{width:78px}
+}
+
+/* ── 창 묶음 가운데 정렬: 남는 폭이 있을 때만 양옆을 비움(넘칠 때는 왼쪽부터 스크롤) ── */
+#panels>.panel:first-child{margin-left:auto}
+#panels>.panel:last-child{margin-right:auto}
+#panels>.panel:first-child{border-left-width:1px} /* 색은 테마별 .panel border-color */
+
+/* ── 터치 기기(휴대폰·태블릿): 창 아래 가로 스크롤 막대 숨김(손가락으로 넘기므로 불필요) ── */
+@media (hover:none) and (pointer:coarse){
+  #panels-wrap{scrollbar-width:none}
+  #panels-wrap::-webkit-scrollbar{display:none;height:0}
+}
+
+/* ── iPhone·iPad 앱 모드: 상태표시줄·홈 표시줄 영역 피하기(안전 영역) ── */
+#header{padding-top:max(6px,env(safe-area-inset-top));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+.panel-text{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+@media(max-width:600px){#header{padding-top:max(5px,env(safe-area-inset-top));padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}}
+
+/* ── 복사 모드(절 길게 누르기)로 고른 절: 절 번호를 붉은 원으로 표시 ── */
+.vi.cp .vn{display:inline-block;min-width:1.7em;padding:0 .3em;line-height:1.55em;text-align:center;border:1.5px solid #e03131;border-radius:999px;color:#e03131 !important;background:rgba(224,49,49,.08);vertical-align:.35em}
+.vi-row.cp>.vn{top:-0.2em;min-width:1.9em}
+.verse-row.cp,.vi.cp{background:rgba(224,49,49,.06) !important;border-left-color:#e03131 !important}
+body.dark .vi.cp .vn,body.dark2 .vi.cp .vn{border-color:#ff6b6b;color:#ff6b6b !important;background:rgba(255,107,107,.14)}
+body.dark .verse-row.cp,body.dark .vi.cp,body.dark2 .verse-row.cp,body.dark2 .vi.cp{background:rgba(255,107,107,.08) !important;border-left-color:#ff6b6b !important}
+body.bright2 .vi.cp .vn{border-color:#c0392b;color:#c0392b !important;background:rgba(192,57,43,.08)}
+body.bright2 .verse-row.cp,body.bright2 .vi.cp{background:rgba(192,57,43,.06) !important;border-left-color:#c0392b !important}
+body .vi.cp:not(.vi-row){border-left-color:transparent !important} /* 이어쓰기: 왼쪽 세로줄 없이 원 번호만 */
+
+/* ── 매일성경 팝업 ── */
+#plan-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:flex-start;justify-content:center;padding:50px 0 20px}
+#plan-modal.open{display:flex}
+#plan-box{background:#fff;border-radius:12px;width:min(420px,94vw);max-height:calc(100vh - 70px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+#plan-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-bottom:1px solid #e5e7eb}
+.pn-cur{font-size:16px;font-weight:700;min-width:110px;text-align:center}
+.pn-arr,.pn-side{border:none;background:transparent;cursor:pointer;font-family:inherit;color:#4f46e5;border-radius:6px}
+.pn-arr{font-size:20px;padding:0 8px;line-height:1.2}
+.pn-side{font-size:12px;color:#9ca3af;padding:4px 6px}
+.pn-arr:hover,.pn-side:hover{background:rgba(79,70,229,.08)}
+.pn-arr:disabled,.pn-side:disabled{opacity:.25;cursor:default;background:transparent}
+#plan-list{overflow:auto;padding:6px 8px}
+.plan-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;color:inherit;text-align:left;font-size:14px}
+.plan-row+.plan-row{border-top:1px solid #f0f1f3;border-radius:0}
+.plan-row:hover{background:#eef2ff}
+.pr-d{width:22px;text-align:right;font-weight:700;color:#6b7280}
+.pr-w{width:16px;font-size:12px;color:#9ca3af}
+.plan-row.sun .pr-d,.plan-row.sun .pr-w{color:#e03131}
+.pr-t{flex:1}
+.pr-tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;background:#4f46e5;color:#fff}
+.plan-row.today{background:#eef2ff;border-radius:8px}
+.plan-foot{font-size:11px;color:#9ca3af;text-align:center;padding:8px 10px;border-top:1px solid #e5e7eb}
+body.dark #plan-box,body.dark2 #plan-box{background:#1b1e22;border:1px solid #3a4048;color:#d5dade}
+body.dark #plan-nav,body.dark2 #plan-nav,body.dark .plan-foot,body.dark2 .plan-foot{border-color:#2c3137}
+body.dark .pn-arr,body.dark2 .pn-arr{color:#8fb0e6}
+body.dark .pn-side,body.dark2 .pn-side,body.dark .pr-w,body.dark2 .pr-w,body.dark .plan-foot,body.dark2 .plan-foot{color:#7d8792}
+body.dark .pr-d,body.dark2 .pr-d{color:#9aa5b0}
+body.dark .plan-row+.plan-row,body.dark2 .plan-row+.plan-row{border-color:#2c3137}
+body.dark .plan-row:hover,body.dark2 .plan-row:hover,body.dark .plan-row.today,body.dark2 .plan-row.today{background:#24304a}
+body.dark .pr-tag,body.dark2 .pr-tag{background:#8fb0e6;color:#10151c}
+body.dark .plan-row.sun .pr-d,body.dark .plan-row.sun .pr-w,body.dark2 .plan-row.sun .pr-d,body.dark2 .plan-row.sun .pr-w{color:#ff6b6b}
+body.bright2 #plan-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
+body.bright2 #plan-nav,body.bright2 .plan-foot{border-color:#d4c4a0}
+body.bright2 .pn-arr{color:#8a6030}
+body.bright2 .plan-row+.plan-row{border-color:#e6dac0}
+body.bright2 .plan-row:hover,body.bright2 .plan-row.today{background:#ede4d0}
+body.bright2 .pr-tag{background:#8a6030}
+@media(max-width:600px){
+  #search-btn .lbl{display:none}
+  #plan-btn,  #more-btn{font-size:11px;padding:3px 7px}
+}
+
+/* ── ⋮ 메뉴: 스마트폰에서만 ── */
+#more-btn{display:none;font-size:16px !important;line-height:1;padding:3px 9px !important}
+#more-menu{position:fixed;z-index:3000;min-width:170px;background:#fff;border:1px solid #d1d5db;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:4px;display:flex;flex-direction:column}
+#more-menu[hidden]{display:none}
+#more-menu button{border:none;background:transparent;text-align:left;padding:11px 14px;font-size:14px;border-radius:7px;cursor:pointer;color:#111827;font-family:'Noto Sans KR',sans-serif}
+#more-menu button+button{border-top:1px solid #f0f1f3}
+#more-menu button:active,#more-menu button:hover{background:#eef2ff}
+body.dark #more-menu,body.dark2 #more-menu{background:#1b1e22;border-color:#3a4048}
+body.dark #more-menu button,body.dark2 #more-menu button{color:#d5dade}
+body.dark #more-menu button+button,body.dark2 #more-menu button+button{border-color:#2c3137}
+body.dark #more-menu button:active,body.dark #more-menu button:hover,body.dark2 #more-menu button:active,body.dark2 #more-menu button:hover{background:#24304a}
+body.bright2 #more-menu{background:#f8f3ea;border-color:#c4b08a}
+body.bright2 #more-menu button{color:#3d2b1a}
+body.bright2 #more-menu button+button{border-color:#e6dac0}
+body.bright2 #more-menu button:active,body.bright2 #more-menu button:hover{background:#ede4d0}
+@media(max-width:600px){
+  #search-btn,#help-btn,#auth-btn,#wrap-btn{display:none !important}
+  #more-btn{display:inline-flex;align-items:center}
+  .theme-sel{max-width:96px}
+}
+
+/* ── 본문+ 버튼: 둘째 줄 맨 오른쪽 ── */
+.hdr-row2 #add-panel-btn{margin-left:auto}
+/* ── 새 버전 알림 ── */
+.update-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;border-radius:12px;background:#16202b;color:#fff;font-size:14px;font-family:'Pretendard Variable',Pretendard,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
+.update-toast[hidden]{display:none}
+.update-toast button{border:none;background:transparent;color:#9cc0ff;font-size:14px;font-weight:700;cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit}
+.update-toast button:hover{background:rgba(255,255,255,.1)}
+body.dark .update-toast,body.dark2 .update-toast{background:#e8ebee;color:#1b1e22}
+body.dark .update-toast button,body.dark2 .update-toast button{color:#243e6b}
+body.bright2 .update-toast{background:#3d2b1a;color:#f8f3ea}
+body.bright2 .update-toast button{color:#f4d9a0}
+</style>
+</head>
+<body class="bright2">
+
+
+<div id="header">
+  <div class="hdr-row1">
+    <span class="header-title">1426 다본문 성경</span>
+    <div class="hdr-btns">
+      <button id="plan-btn" onclick="openPlan()">매일성경</button>
+      <select id="theme-sel" class="theme-sel" title="색상 모드">
+        <option value="system">🌓 시스템 설정 사용</option>
+        <option value="bright">☀ Bright</option>
+        <option value="bright2">☀ Bright2</option>
+        <option value="dark">🌙 Dark1</option>
+        <option value="dark2">🌙 Dark2</option>
+      </select>
+      <button id="search-btn" onclick="openSearch()">🔍<span class="lbl"> 검색</span></button>
+      <button id="help-btn" onclick="openHelp()">안내</button>
+      <button id="wrap-btn" onclick="toggleWrap()">줄바꿈</button>
+      <button id="auth-btn" onclick="authClick()">로그인</button>
+      <button id="more-btn" onclick="toggleMore(event)" title="더 보기" aria-label="더 보기">⋮</button>
+    </div>
+  </div>
+  <div class="hdr-row2">
+    <span class="cl">폰트</span>
+    <select class="hsel" id="font-sel">
+      <option value="'Pretendard Variable',Pretendard,sans-serif">Pretendard</option>
+      <option value="'Noto Sans KR',sans-serif">노토산스</option>
+      <option value="'Noto Serif KR',serif">노토세리프</option>
+      <option value="'Nanum Myeongjo',serif">나눔명조</option>
+      <option value="'Nanum Gothic',sans-serif">나눔고딕</option>
+      <option value="'KoPub Dotum',sans-serif" selected>KoPub</option>
+      <option value="Georgia,serif">Georgia</option>
+    </select>
+    <span class="cl">크기</span>
+    <div class="swrap">
+      <button class="sbtn" id="size-down">▼</button>
+      <span class="sval" id="size-val">16</span>
+      <button class="sbtn" id="size-up">▲</button>
+    </div>
+    <button id="sync-btn" onclick="syncPanels()">연동</button>
+    <button id="add-panel-btn" onclick="addPanel()">본문+</button>
+  </div>
+</div>
+
+<div id="panels-wrap">
+  <div id="panels"></div>
+</div>
+
+<script>
+const OT=[["genesis","창세기",50,1],["exodus","출애굽기",40,2],["leviticus","레위기",27,3],["numbers","민수기",36,4],["deuteronomy","신명기",34,5],["joshua","여호수아",24,6],["judges","사사기",21,7],["ruth","룻기",4,8],["1samuel","사무엘상",31,9],["2samuel","사무엘하",24,10],["1kings","열왕기상",22,11],["2kings","열왕기하",25,12],["1chronicles","역대상",29,13],["2chronicles","역대하",36,14],["ezra","에스라",10,15],["nehemiah","느헤미야",13,16],["esther","에스더",10,17],["job","욥기",42,18],["psalms","시편",150,19],["proverbs","잠언",31,20],["ecclesiastes","전도서",12,21],["songofsolomon","아가",8,22],["isaiah","이사야",66,23],["jeremiah","예레미야",52,24],["lamentations","애가",5,25],["ezekiel","에스겔",48,26],["daniel","다니엘",12,27],["hosea","호세아",14,28],["joel","요엘",3,29],["amos","아모스",9,30],["obadiah","오바댜",1,31],["jonah","요나",4,32],["micah","미가",7,33],["nahum","나훔",3,34],["habakkuk","하박국",3,35],["zephaniah","스바냐",3,36],["haggai","학개",2,37],["zechariah","스가랴",14,38],["malachi","말라기",4,39]];
+const NT=[["matthew","마태복음",28,40],["mark","마가복음",16,41],["luke","누가복음",24,42],["john","요한복음",21,43],["acts","사도행전",28,44],["romans","로마서",16,45],["1corinthians","고린도전서",16,46],["2corinthians","고린도후서",13,47],["galatians","갈라디아서",6,48],["ephesians","에베소서",6,49],["philippians","빌립보서",4,50],["colossians","골로새서",4,51],["1thessalonians","데살로니가전서",5,52],["2thessalonians","데살로니가후서",3,53],["1timothy","디모데전서",6,54],["2timothy","디모데후서",4,55],["titus","디도서",3,56],["philemon","빌레몬서",1,57],["hebrews","히브리서",13,58],["james","야고보서",5,59],["1peter","베드로전서",5,60],["2peter","베드로후서",3,61],["1john","요한일서",5,62],["2john","요한이서",1,63],["3john","요한삼서",1,64],["jude","유다서",1,65],["revelation","요한계시록",22,66]];
+const BMAP={};
+[...OT,...NT].forEach(([id,ko,ch,num])=>{BMAP[id]={ko,ch,num}});
+const API_MAP={"1samuel":"1+samuel","2samuel":"2+samuel","1kings":"1+kings","2kings":"2+kings","1chronicles":"1+chronicles","2chronicles":"2+chronicles","songofsolomon":"song+of+solomon","1corinthians":"1+corinthians","2corinthians":"2+corinthians","1thessalonians":"1+thessalonians","2thessalonians":"2+thessalonians","1timothy":"1+timothy","2timothy":"2+timothy","1peter":"1+peter","2peter":"2+peter","1john":"1+john","2john":"2+john","3john":"3+john"};
+const TRANS=[
+  {id:'kor',    l:'개역개정',scope:'all',src:'local',  fid:'kor'},
+  {id:'saebeon',l:'새번역',  scope:'all',src:'local',  fid:'saebeon'},
+  {id:'esv',    l:'ESV',     scope:'all',src:'local',  fid:'esv'},
+  {id:'niv',    l:'NIV',     scope:'all',src:'local',  fid:'niv'},
+  {id:'NKJV',   l:'NKJV',    scope:'all',src:'bolls',   fid:null},
+  {id:'kjv',    l:'KJV',     scope:'all',src:'bibleapi',fid:null},
+  {id:'asv',    l:'ASV',     scope:'all',src:'bibleapi',fid:null},
+  {id:'web',    l:'WEB',     scope:'all',src:'bibleapi',fid:null},
+  {id:'WLC',    l:'히브리어',scope:'ot', src:'bolls',  fid:null},
+  {id:'SBLGNT', l:'헬라어',  scope:'nt', src:'bolls',  fid:null},
+  {id:'mh',     l:'매튜헨리주석',scope:'all',src:'chapter',fid:'commentary'},
+];
+
+
+const KO_ABBR=["창", "출", "레", "민", "신", "수", "삿", "룻", "삼상", "삼하", "왕상", "왕하", "대상", "대하", "스", "느", "에", "욥", "시", "잠", "전", "아", "사", "렘", "애", "겔", "단", "호", "욜", "암", "옵", "욘", "미", "나", "합", "습", "학", "슥", "말", "마", "막", "눅", "요", "행", "롬", "고전", "고후", "갈", "엡", "빌", "골", "살전", "살후", "딤전", "딤후", "딛", "몬", "히", "약", "벧전", "벧후", "요일", "요이", "요삼", "유", "계"];
+const EN_BOOKS=["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"];
+const HEB_BOOKS=["בְּרֵאשִׁית", "שְׁמוֹת", "וַיִּקְרָא", "בְּמִדְבַּר", "דְּבָרִים", "יְהוֹשֻׁעַ", "שׁוֹפְטִים", "רוּת", "שְׁמוּאֵל א", "שְׁמוּאֵל ב", "מְלָכִים א", "מְלָכִים ב", "דִּבְרֵי הַיָּמִים א", "דִּבְרֵי הַיָּמִים ב", "עֶזְרָא", "נְחֶמְיָה", "אֶסְתֵּר", "אִיּוֹב", "תְּהִלִּים", "מִשְׁלֵי", "קֹהֶלֶת", "שִׁיר הַשִּׁירִים", "יְשַׁעְיָהוּ", "יִרְמְיָהוּ", "אֵיכָה", "יְחֶזְקֵאל", "דָּנִיֵּאל", "הוֹשֵׁעַ", "יוֹאֵל", "עָמוֹס", "עֹבַדְיָה", "יוֹנָה", "מִיכָה", "נַחוּם", "חֲבַקּוּק", "צְפַנְיָה", "חַגַּי", "זְכַרְיָה", "מַלְאָכִי"];
+const GRK_BOOKS=["Ματθαῖος", "Μάρκος", "Λουκᾶς", "Ἰωάννης", "Πράξεις", "Ῥωμαίους", "Αʹ Κορινθίους", "Βʹ Κορινθίους", "Γαλάτας", "Ἐφεσίους", "Φιλιππησίους", "Κολοσσαεῖς", "Αʹ Θεσσαλονικεῖς", "Βʹ Θεσσαλονικεῖς", "Αʹ Τιμόθεον", "Βʹ Τιμόθεον", "Τίτον", "Φιλήμονα", "Ἑβραίους", "Ἰάκωβος", "Αʹ Πέτρου", "Βʹ Πέτρου", "Αʹ Ἰωάννου", "Βʹ Ἰωάννου", "Γʹ Ἰωάννου", "Ἰούδας", "Ἀποκάλυψις"];
+
+function bookLabel(bid, transId) {
+  const allBooks = [...OT, ...NT];
+  const idx = allBooks.findIndex(([id]) => id === bid);
+  if (idx === -1) return bid;
+  const ko = allBooks[idx][1];
+  const ab = KO_ABBR[idx] || ko;
+  if (transId === 'kor' || transId === 'saebeon' || transId === 'mh') return ko;
+  if (transId === 'WLC') return ab + ' ' + (HEB_BOOKS[idx] || '');
+  if (transId === 'SBLGNT') {
+    const ntStart = OT.length;
+    return ab + ' ' + (GRK_BOOKS[idx - ntStart] || '');
+  }
+  return ab + ' ' + (EN_BOOKS[idx] || '');
+}
+
+const SB_URL='https://unlvmtixzhvzxfexynri.supabase.co';
+const SB_KEY='sb_publishable_JDZtHylyUtZeDjph1aGUbQ_ru-YB_ga';
+
+let authUser=null, authToken=null, authAllowed=false;
+function sbH(){return{'apikey':SB_KEY,'Authorization':'Bearer '+(authToken||SB_KEY),'Content-Type':'application/json','Prefer':'return=minimal'};}
+
+async function sbLoad(trans,book,ch){
+  if(!authUser) return [];
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/bible_highlights?select=verse&trans=eq.'+encodeURIComponent(trans)+'&book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch,{headers:sbH()});
+    if(!r.ok)return[];
+    return(await r.json()).map(d=>d.verse);
+  }catch(e){return[];}
+}
+async function sbSave(trans,book,ch,v){
+  if(!authUser||!authAllowed) return;
+  try{await fetch(SB_URL+'/rest/v1/bible_highlights',{method:'POST',headers:sbH(),body:JSON.stringify({trans,book,chapter:ch,verse:v,user_id:authUser.id})});}catch(e){}
+}
+async function sbDel(trans,book,ch,v){
+  if(!authUser) return;
+  try{await fetch(SB_URL+'/rest/v1/bible_highlights?trans=eq.'+encodeURIComponent(trans)+'&book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch+'&verse=eq.'+v,{method:'DELETE',headers:sbH()});}catch(e){}
+}
+
+const cache={};
+// ── 표시 치환 (DB 무변경) ──
+const KO_REPLACE=[['세례','침례']];
+function applyReplace(text,transId){
+  if(transId!=='kor'&&transId!=='saebeon') return text;
+  let t=text;
+  KO_REPLACE.forEach(([from,to])=>{t=t.replaceAll(from,to);});
+  return t;
+}
+
+async function fetchVerses(bookId,chapter,transId){
+  const tr=TRANS.find(t=>t.id===transId);
+  if(tr.src==='local'){
+    const key=`${tr.fid}_${bookId}`;
+    if(!cache[key]){
+      const url=tr.fid==='kor'?`bible/${bookId}.json`:`bible/${bookId}_${tr.fid}.json`;
+      const r=await fetch(url,{cache:'no-cache'});
+      if(!r.ok)throw new Error(`${url} 없음 — bible/ 폴더 JSON 파일을 확인하세요.`);
+      cache[key]=await r.json();
+    }
+    return (cache[key].chapters[chapter]||[]).map(v=>{const o={...v,t:applyReplace(v.t,transId)};if(o.h)o.h=applyReplace(o.h,transId);return o;});
+  }
+  if(tr.src==='chapter'){
+    const key=`${tr.fid}_${bookId}_${chapter}`;
+    if(cache[key]) return cache[key];
+    const sub=BMAP[bookId].num<=39?'ot':'nt';
+    const r=await fetch(`${tr.fid}/${sub}/${bookId}_${chapter}.json`,{cache:'no-cache'});
+    if(!r.ok)throw new Error(`${BMAP[bookId].ko} ${chapter}장 주석이 없습니다.`);
+    const d=await r.json();
+    cache[key]=(d.sections||[]).map(s=>({n:s.n,t:s.t,f:'',h:s.h}));
+    return cache[key];
+  }
+  if(tr.src==='bolls'){
+    const key=`${transId}_${bookId}_${chapter}`;
+    if(cache[key])return cache[key];
+    // bolls.life 책 번호: SBLGNT/WLC는 NT/OT 전용이므로 전체(1-66) 번호 사용
+    const bookNum=BMAP[bookId].num;
+    // SBLGNT는 여러 ID가 가능 — 순서대로 시도
+    const transIds=transId==='SBLGNT'?['SBLGNT','TR','NA28','THGNT']:[transId];
+    let parsed=null;
+    let lastErr='';
+    for(const tid of transIds){
+      try{
+        const r=await fetch(`https://bolls.life/get-text/${tid}/${bookNum}/${chapter}/`);
+        const txt=await r.text();
+        const arr=JSON.parse(txt);
+        if(Array.isArray(arr)&&arr.length>0){parsed=arr;break;}
+        lastErr=`${tid}: 빈 응답`;
+      }catch(e){lastErr=`${tid}: ${e.message}`;}
+    }
+    if(!parsed)throw new Error(`헬라어 본문 없음 (book:${bookNum}, ch:${chapter}) — ${lastErr}`);
+    cache[key]=parsed.map(v=>({n:v.verse,t:v.text||v.content||'',f:''}));
+    return cache[key];
+  }
+  const ai=API_MAP[bookId]||bookId;
+  const r=await fetch(`https://bible-api.com/${ai}+${chapter}?translation=${transId}`);
+  const d=await r.json();
+  if(d.error)throw new Error(d.error);
+  return d.verses.map(v=>({n:v.verse,t:v.text.replace(/\n/g,' ').trim(),f:''}));
+}
+
+let gFont="'KoPub Dotum',sans-serif",gSize=16;   // 기본값
+// 기기별 저장값(글씨체·크기)이 있으면 기본값보다 우선
+const PREF_KEY='bible_prefs';
+try{const pf=JSON.parse(localStorage.getItem(PREF_KEY)||'{}');
+  if(pf.font&&[...document.getElementById('font-sel').options].some(o=>o.value===pf.font))gFont=pf.font;
+  if(pf.size>=10&&pf.size<=24)gSize=pf.size;}catch(e){}
+document.getElementById('font-sel').value=gFont;
+document.getElementById('size-val').textContent=gSize;
+function savePrefs(){try{localStorage.setItem(PREF_KEY,JSON.stringify({font:gFont,size:gSize}));}catch(e){}}
+const LH_INLINE=1.9, LH_BREAK=1.6; // 이어쓰기 / 줄바꿈 줄간격
+function curLH(){return lineBreak?LH_BREAK:LH_INLINE;}
+document.getElementById('font-sel').onchange=e=>{gFont=e.target.value;applyGlobal();savePrefs();};
+document.getElementById('size-up').onclick=()=>{if(gSize<24){gSize++;document.getElementById('size-val').textContent=gSize;applyGlobal();savePrefs();}};
+document.getElementById('size-down').onclick=()=>{if(gSize>10){gSize--;document.getElementById('size-val').textContent=gSize;applyGlobal();savePrefs();}};
+function vMB(){return Math.round(gSize*0.35)+'px';}
+function vPT(){return Math.round(gSize*0.14)+'px';}
+function vFN(){return Math.round(gSize*0.84)+'px';}
+function applyGlobal(){
+  // 줄바꿈 모드: .verse-text
+  document.querySelectorAll('.verse-text').forEach(e=>{e.style.fontFamily=gFont;e.style.fontSize=gSize+'px';e.style.lineHeight=curLH();});
+  // 이어쓰기 모드: .verse-para
+  document.querySelectorAll('.verse-para').forEach(e=>{e.style.fontFamily=gFont;e.style.fontSize=gSize+'px';e.style.lineHeight=curLH();});
+  document.querySelectorAll('.vi-row').forEach(e=>{e.style.marginBottom=vMB();});
+  document.querySelectorAll('.footnote,.sec-footnotes').forEach(e=>{e.style.fontFamily=gFont;e.style.fontSize=vFN();});
+  document.querySelectorAll('.verse-row').forEach(e=>{e.style.marginBottom=vMB();});
+  document.querySelectorAll('.verse-num').forEach(e=>{e.style.paddingTop=vPT();});
+}
+
+let pid=0;const panels=[];
+
+const MAX_PANELS=10;
+function createPanel(initBook='john', initChapter=3, initTrans='kor', force=false){
+  if(panels.length>=MAX_PANELS)return; // 창은 최대 10개
+  const id=++pid;
+  const state={bookId:initBook,chapter:initChapter,trans:initTrans,hl:new Set(),chOpen:false,targetVerse:null};
+  let copyMode=false;
+  let copySet=new Set();
+  let lpTimer=null;
+  let lpTriggered=false;
+  const el=document.createElement('div');el.className='panel';
+  const bar=document.createElement('div');bar.className='panel-bar';
+  const textDiv=document.createElement('div');textDiv.className='panel-text';
+  el.appendChild(bar);
+  const cpBar=document.createElement('div');cpBar.className='cp-bar';
+  el.appendChild(cpBar);
+  el.appendChild(textDiv);
+
+  document.addEventListener('click',e=>{
+    if(state.chOpen&&!bar.contains(e.target)&&!document.getElementById('ch-drop-'+id)?.contains(e.target)){state.chOpen=false;document.getElementById('ch-drop-'+id)?.remove();}
+  });
+
+  function availBooks(){
+    const tr=TRANS.find(t=>t.id===state.trans);
+    if(tr.scope==='ot')return{ot:OT,nt:[]};
+    if(tr.scope==='nt')return{ot:[],nt:NT};
+    return{ot:OT,nt:NT};
+  }
+
+  function updateCpBar(){
+    const count=copySet.size;
+    cpBar.innerHTML=count>0
+      ?`<span class="cp-label">📋 복사 모드 — ${count}절 선택됨</span><button class="cp-confirm" onclick="">복사</button><button class="cp-cancel" onclick="">취소</button>`
+      :`<span class="cp-label">📋 복사 모드 — 절을 클릭해서 선택하세요</span><button class="cp-cancel" onclick="">취소</button>`;
+    cpBar.querySelector('.cp-cancel').onclick=exitCopyMode;
+    const conf=cpBar.querySelector('.cp-confirm');
+    if(conf) conf.onclick=doCopyMode;
+  }
+
+  function enterCopyMode(initVerse){
+    copyMode=true;
+    copySet=new Set();
+    if(initVerse!=null){
+      copySet.add(initVerse);
+      const el=textDiv.querySelector(`[data-v="${initVerse}"]`);
+      if(el) el.classList.add('cp');
+    }
+    cpBar.classList.add('active');
+    updateCpBar();
+  }
+
+  function exitCopyMode(){
+    copyMode=false;
+    copySet=new Set();
+    cpBar.classList.remove('active');
+    textDiv.querySelectorAll('.cp').forEach(e=>e.classList.remove('cp'));
+  }
+
+  function doCopyMode(){
+    if(copySet.size===0) return;
+    const sorted=[...copySet].sort((a,b)=>a-b);
+    const bko=BMAP[state.bookId].ko;
+    const transLabel=TRANS.find(t=>t.id===state.trans)?.l||state.trans;
+    const ranges=[];
+    let s=sorted[0],e2=sorted[0];
+    for(let i=1;i<sorted.length;i++){
+      if(sorted[i]===e2+1){e2=sorted[i];}
+      else{ranges.push([s,e2]);s=sorted[i];e2=sorted[i];}
+    }
+    ranges.push([s,e2]);
+    const refs=ranges.map(([a,b])=>a===b?`${state.chapter}:${a}`:`${state.chapter}:${a}-${b}`).join(', ');
+    const lines=sorted.map(v=>{
+      const el=textDiv.querySelector(`[data-v="${v}"]`);
+      if(!el) return null;
+      const vt=el.querySelector('.verse-text');
+      let plain=vt?vt.innerText||vt.textContent:el.innerText||el.textContent||'';
+      if(!vt){const vn=el.querySelector('sup');if(vn)plain=plain.slice((vn.innerText||vn.textContent||'').length).trim();}
+      return `${v} ${plain.trim()}`;
+    }).filter(Boolean);
+    const text=`${bko} ${refs}`+'\n'+lines.join('\n');
+    navigator.clipboard.writeText(text).then(()=>{
+      const conf=cpBar.querySelector('.cp-confirm');
+      if(conf){conf.textContent='복사됨 ✓';setTimeout(()=>{exitCopyMode();},1200);}
+    }).catch(()=>{
+      const ta=document.createElement('textarea');
+      ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+      exitCopyMode();
+    });
+  }
+
+  function renderDropdown(){
+    const old=document.getElementById('ch-drop-'+id);if(old)old.remove();
+    if(!state.chOpen)return;
+    const maxCh=BMAP[state.bookId].ch;
+    const dd=document.createElement('div');dd.className='ch-dropdown';dd.id='ch-drop-'+id;
+    for(let n=1;n<=maxCh;n++){
+      const item=document.createElement('div');
+      item.className='ch-item'+(n===state.chapter?' cur':'');
+      item.textContent=n;
+      item.onclick=e=>{e.stopPropagation();state.chapter=n;state.chOpen=false;document.getElementById('ch-drop-'+id)?.remove();renderBar();load();saveSession();};
+      dd.appendChild(item);
+    }
+    document.body.appendChild(dd);
+    // position: below ch-btn, right-edge safe
+    const btn=bar.querySelector('.ch-btn');
+    const rect=btn.getBoundingClientRect();
+    const dropW=Math.min(maxCh<=30?220:maxCh<=60?280:340, window.innerWidth-24);
+    dd.style.width=dropW+'px';
+    let left=rect.left;
+    if(left+dropW>window.innerWidth-12) left=window.innerWidth-dropW-12;
+    dd.style.left=Math.max(12,left)+'px';
+    dd.style.top=(rect.bottom+4)+'px';
+  }
+
+  function renderBar(){
+    const{ot,nt}=availBooks();
+    bar.innerHTML=`
+      <select class="bar-sel trans-sel">
+        ${TRANS.map(t=>`<option value="${t.id}"${t.id===state.trans?' selected':''}>${t.l}</option>`).join('')}
+      </select>
+      <select class="book-sel">
+        ${ot.length?`<optgroup label="구약">${ot.map(([bid,bko])=>`<option value="${bid}"${bid===state.bookId?' selected':''}>${bookLabel(bid,state.trans)}</option>`).join('')}</optgroup>`:''}
+        ${nt.length?`<optgroup label="신약">${nt.map(([bid,bko])=>`<option value="${bid}"${bid===state.bookId?' selected':''}>${bookLabel(bid,state.trans)}</option>`).join('')}</optgroup>`:''}
+      </select>
+      <div class="nav-wrap" style="display:flex;align-items:center;gap:2px;position:relative">
+        <button class="arr-btn prev-btn">‹</button>
+        <button class="ch-btn">${state.chapter}</button>
+        <button class="arr-btn next-btn">›</button>
+      </div>
+      ${panels.length>1?'<button class="close-btn">✕</button>':''}
+    `;
+    bar.querySelector('.trans-sel').onchange=e=>{
+      state.trans=e.target.value;
+      const{ot,nt}=availBooks();const all=[...ot,...nt];
+      if(!all.find(([bid])=>bid===state.bookId)){state.bookId=all[0][0];state.chapter=1;}
+      state.chOpen=false;renderBar();load();saveSession();
+      if(LOCAL_TRANS.includes(state.trans)) preloadAllBooks(state.trans);
+    };
+    bar.querySelector('.book-sel').onchange=e=>{state.bookId=e.target.value;state.chapter=1;state.chOpen=false;renderBar();load();saveSession();};
+    bar.querySelector('.prev-btn').onclick=e=>{e.stopPropagation();if(state.chapter>1){state.chapter--;state.chOpen=false;renderBar();load();saveSession();}};
+    bar.querySelector('.next-btn').onclick=e=>{e.stopPropagation();const mx=BMAP[state.bookId].ch;if(state.chapter<mx){state.chapter++;state.chOpen=false;renderBar();load();saveSession();}};
+    bar.querySelector('.ch-btn').onclick=e=>{e.stopPropagation();state.chOpen=!state.chOpen;renderDropdown();};
+    const cb=bar.querySelector('.close-btn');if(cb)cb.onclick=()=>removePanel(id);
+    if(state.chOpen)renderDropdown();
+    textDiv.style.direction=state.trans==='WLC'?'rtl':'ltr';
+  }
+
+  function updateCopyBtn(){
+    const existing=bar.querySelector('.copy-btn');
+    if(state.hl.size===0){
+      if(existing) existing.remove();
+      return;
+    }
+    if(!existing){
+      const btn=document.createElement('button');
+      btn.className='copy-btn';
+      btn.textContent='복사';
+      btn.onclick=e=>{e.stopPropagation();copyHighlighted(btn);};
+      bar.appendChild(btn);
+    }
+  }
+
+  function copyHighlighted(btn){
+    if(state.hl.size===0) return;
+    const sorted=[...state.hl].sort((a,b)=>a-b);
+    const bko=BMAP[state.bookId].ko;
+    const transLabel=TRANS.find(t=>t.id===state.trans)?.l||state.trans;
+
+    // Group consecutive verses into ranges
+    const ranges=[];
+    let start=sorted[0],end=sorted[0];
+    for(let i=1;i<sorted.length;i++){
+      if(sorted[i]===end+1){end=sorted[i];}
+      else{ranges.push([start,end]);start=sorted[i];end=sorted[i];}
+    }
+    ranges.push([start,end]);
+
+    // Build reference string: 3:16-17, 3:20
+    const refs=ranges.map(([s,e])=>
+      s===e?`${state.chapter}:${s}`:`${state.chapter}:${s}-${e}`
+    ).join(', ');
+
+    // Get verse texts from DOM
+    const lines=[];
+    sorted.forEach(v=>{
+      const el2=textDiv.querySelector(`[data-v="${v}"]`);
+      if(el2){
+        const vnum=el2.querySelector('.vn');
+        let plain=el2.innerText||el2.textContent||'';
+        if(vnum) plain=plain.slice((vnum.innerText||vnum.textContent||'').length).trim();
+        lines.push(`${v} ${plain.trim()}`);
+      }
+    });
+
+    const header=`${bko} ${refs}`;
+    const text=header+'\n'+lines.join('\n');
+
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='복사됨 ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='복사';btn.classList.remove('copied');},2000);
+    }).catch(()=>{
+      // Fallback for older browsers
+      const ta=document.createElement('textarea');
+      ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      document.execCommand('copy');document.body.removeChild(ta);
+      btn.textContent='복사됨 ✓';btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='복사';btn.classList.remove('copied');},2000);
+    });
+  }
+
+  async function load(){
+    if(copyMode) exitCopyMode();
+    state.hl.clear();
+    const oldCopyBtn=bar.querySelector('.copy-btn');
+    if(oldCopyBtn) oldCopyBtn.remove();
+    textDiv.innerHTML=`<div class="loading"><div class="spinner">✦</div><br>불러오는 중...</div>`;
+    const{bookId,chapter,trans}=state;const isRTL=trans==='WLC';
+    try{
+      const verses=await fetchVerses(bookId,chapter,trans);
+      if(!verses.length){textDiv.innerHTML=`<div class="err-msg">${chapter}장 데이터가 없습니다.</div>`;return;}
+      // Build sections from headings
+      const sections=[];
+      let curSec={h:null,verses:[]};
+      verses.forEach(({n,t,f,h})=>{
+        if(h&&curSec.verses.length>0){sections.push({...curSec});curSec={h,verses:[{n,t,f}]};}
+        else{if(h)curSec.h=h;curSec.verses.push({n,t,f});}
+      });
+      if(curSec.verses.length>0)sections.push(curSec);
+
+      let html=`<div class="ch-label">${BMAP[bookId].ko} ${chapter}</div>`;
+      sections.forEach(sec=>{
+        if(sec.h) html+=`<span class="sec-heading" style="font-family:${gFont}">${sec.h}</span>`;
+        html+=`<div class="verse-para" style="font-family:${gFont};font-size:${gSize}px;line-height:${curLH()}">`;
+        sec.verses.forEach(({n,t})=>{
+          if(lineBreak){
+            html+=`<div class="vi vi-row${state.hl.has(n)?' hl':''}" data-v="${n}" style="margin-bottom:${vMB()}"><sup class="vn">${n}</sup><span class="vbody"><span class="vt">${t}</span></span></div>`;
+          } else {
+            html+=`<span class="vi${state.hl.has(n)?' hl':''}" data-v="${n}"><sup class="vn">${n}</sup><span class="vt">${t}</span> </span>`;
+          }
+        });
+        html+=`</div>`;
+        const fns=sec.verses.filter(v=>v.f).map(v=>v.f).join('<br>');
+        if(fns) html+=`<div class="sec-footnotes" style="font-family:${gFont};font-size:${vFN()}">${fns}</div>`;
+      });
+      textDiv.innerHTML=html;
+
+      textDiv.querySelectorAll('.vi').forEach(span=>{
+        const v=+span.dataset.v;
+        // Long press: touch
+        span.addEventListener('touchstart',()=>{
+          lpTriggered=false;
+          lpTimer=setTimeout(()=>{lpTriggered=true;enterCopyMode(v);},600);
+        },{passive:true});
+        span.addEventListener('touchend',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
+        span.addEventListener('touchmove',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
+        // Long press: mouse (PC)
+        span.addEventListener('mousedown',()=>{
+          lpTriggered=false;
+          lpTimer=setTimeout(()=>{lpTriggered=true;enterCopyMode(v);},600);
+        });
+        span.addEventListener('mouseup',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
+        span.addEventListener('mouseleave',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
+        span.onclick=()=>{
+          if(lpTriggered){lpTriggered=false;return;}
+          if(copyMode){
+            copySet.has(v)?copySet.delete(v):copySet.add(v);
+            span.classList.toggle('cp',copySet.has(v));
+            updateCpBar();
+            return;
+          }
+          state.hl.has(v)?state.hl.delete(v):state.hl.add(v);
+          span.classList.toggle('hl');
+          updateCopyBtn();
+        };
+      });
+      // Scroll to and highlight target verse if set
+      if(state.targetVerse){
+        const target=textDiv.querySelector(`.vi[data-v="${state.targetVerse}"]`);
+        if(target&&state.targetNoHl){
+          setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),80);
+        }else if(target){
+          target.classList.add('hl');
+          state.hl.add(state.targetVerse);
+          updateCopyBtn();
+          setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'center'}),80);
+        }
+        state.targetNoHl=false;
+        state.targetVerse=null;
+      }
+      // ── Load Supabase highlights ──
+      sbLoad(trans,bookId,chapter).then(savedVerses=>{
+        savedVerses.forEach(v=>{
+          state.hl.add(v);
+          const el2=textDiv.querySelector(`[data-v="${v}"]`);
+          if(el2) el2.classList.add('hl');
+        });
+        if(state.hl.size>0) updateCopyBtn();
+      });
+    }catch(e){
+      textDiv.innerHTML=`<div class="err-msg">${e.message}</div>`;
+    }
+  }
+
+  document.getElementById('panels').appendChild(el);
+  panels.push({id, el, renderBar,
+    reload:()=>load(),
+    getState:()=>({bookId:state.bookId, chapter:state.chapter, trans:state.trans}),
+    setBookChapter:(bookId,chapter,trans,targetVerse,noHl)=>{
+      state.bookId=bookId;
+      state.chapter=chapter;
+      if(trans) state.trans=trans;
+      state.chOpen=false;
+      state.targetVerse=targetVerse||null;
+      state.targetNoHl=!!noHl;
+      renderBar();
+      load();
+    }
+  });
+  updateUI();renderBar();load();saveSession();
+}
+
+function removePanel(id){
+  const idx=panels.findIndex(p=>p.id===id);if(idx===-1)return;
+  panels[idx].el.remove();panels.splice(idx,1);
+  updateUI();saveSession();
+}
+function addPanel(){createPanel();}
+let lineBreak=true; // 기본값: 줄바꿈
+
+function toggleWrap(){
+  lineBreak=!lineBreak;
+  const btn=document.getElementById('wrap-btn');
+  btn.classList.toggle('active',lineBreak);
+  btn.textContent=lineBreak?'줄바꿈':'이어쓰기';
+  // Re-render all panels
+  panels.forEach(p=>p.reload());
+}
+
+// ── 색상 모드: 기기별 저장, '시스템 설정 사용'은 기기의 밝게/어둡게를 따름 ──
+const THEME_KEY='bible_theme';
+const THEME_SYS={light:'bright2',dark:'dark2'};
+const darkMQ=window.matchMedia('(prefers-color-scheme: dark)');
+function getThemeMode(){try{return localStorage.getItem(THEME_KEY)||'system';}catch(e){return 'system';}}
+function applyThemeMode(mode){
+  const cls=mode==='system'?(darkMQ.matches?THEME_SYS.dark:THEME_SYS.light):mode;
+  document.body.classList.remove('dark','dark2','bright2');
+  if(cls!=='bright')document.body.classList.add(cls);
+  document.documentElement.style.colorScheme=(cls==='dark'||cls==='dark2')?'dark':'light';
+  const tc=document.querySelector('meta[name="theme-color"]');
+  if(tc)tc.content={bright:'#ffffff',bright2:'#f5f0e4',dark:'#1b1e22',dark2:'#1b1e22'}[cls];
+  const sel=document.getElementById('theme-sel');if(sel)sel.value=mode;
+}
+function setThemeMode(mode){try{localStorage.setItem(THEME_KEY,mode);}catch(e){}applyThemeMode(mode);}
+document.getElementById('theme-sel').onchange=e=>setThemeMode(e.target.value);
+darkMQ.addEventListener('change',()=>{if(getThemeMode()==='system')applyThemeMode('system');});
+applyThemeMode(getThemeMode());
+// 좁은 화면(휴대폰)에서는 '시스템 설정 사용'을 '시스템'으로 짧게
+const narrowMQ=window.matchMedia('(max-width:600px)');
+function labelThemeSel(){const o=document.querySelector('#theme-sel option[value="system"]');if(o)o.textContent=narrowMQ.matches?'🌓 시스템':'🌓 시스템 설정 사용';}
+narrowMQ.addEventListener('change',labelThemeSel);labelThemeSel();
+// ── 연동: 열린 창의 본문 중 하나를 골라, 체크한 역본들로 나란히 펼치기 ──
+const SYNC_DEFAULT=['kor','saebeon','esv','niv','NKJV'];
+const SYNC_KEY='bible_sync_trans';
+function syncChecked(){
+  try{const v=JSON.parse(localStorage.getItem(SYNC_KEY));if(Array.isArray(v))return v;}catch(e){}
+  return SYNC_DEFAULT.slice();
+}
+function transFits(t,bookId){
+  if(t.scope==='ot')return OT.some(([b])=>b===bookId);
+  if(t.scope==='nt')return NT.some(([b])=>b===bookId);
+  return true;
+}
+function syncPanels(){ openSync(); }
+
+// ── 스마트폰: ⋮ 메뉴(검색 / 안내 / 줄바꿈 / 로그인·로그아웃) ──
+function toggleMore(e){
+  e.stopPropagation();
+  const m=document.getElementById('more-menu');
+  if(!m.hidden){m.hidden=true;return;}
+  const items=[
+    ['🔍 검색',()=>openSearch()],
+    ['안내',()=>openHelp()],
+    ['↵ '+(lineBreak?'줄바꿈 → 이어쓰기로':'이어쓰기 → 줄바꿈으로'),()=>toggleWrap()],
+    [document.getElementById('auth-btn').textContent.trim(),()=>authClick()]
+  ];
+  m.innerHTML=items.map((it,i)=>`<button type="button" data-i="${i}">${it[0]}</button>`).join('');
+  m.querySelectorAll('button').forEach(b=>b.onclick=()=>{m.hidden=true;items[+b.dataset.i][1]();});
+  const r=document.getElementById('more-btn').getBoundingClientRect();
+  m.style.top=(r.bottom+6)+'px';m.style.right=Math.max(8,window.innerWidth-r.right)+'px';
+  m.hidden=false;
+}
+document.addEventListener('click',e=>{const m=document.getElementById('more-menu');if(m&&!m.hidden&&!m.contains(e.target))m.hidden=true;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('more-menu');if(m)m.hidden=true;}});
+
+// ── 매일성경 읽기표(성서유니온, 2026) ──
+// 연도별 읽기표(성서유니온 매일성경). 새 해 추가 시 이 객체에 "연도":{월:[일별 본문]} 추가
+const RP_DATA={"2024":{"1":["신명기 1:1-18","신 1:19-33","신 1:34-46","신 2:1-25","신 2:26-37","신 3:1-11","신 3:12-29","신 4:1-14","신 4:15-31","신 4:32-43","신 4:44-5:10","신 5:11-21","신 5:22-33","신 6:1-9","신 6:10-25","신 7:1-11","신 7:12-26","신 8:1-10","신 8:11-20","신 9:1-12","신 9:13-29","신 10:1-22","신 11:1-17","신 11:18-32","신 12:1-19","신 12:20-32","신 13:1-18","신 14:1-21","신 14:22-29","신 15:1-23","신 16:1-17"],"2":["신 16:18-17:13","신 17:14-20","신 18:1-14","시편 100:1-5","시 101:1-8","시 102:1-11","시 102:12-28","마가복음 1:1-11","막 1:12-20","막 1:21-34","막 1:35-45","막 2:1-12","막 2:13-28","막 3:1-19","막 3:20-35","막 4:1-12","막 4:13-25","막 4:26-34","막 4:35-41","막 5:1-20","막 5:21-34","막 5:35-43","막 6:1-13","막 6:14-29","막 6:30-44","막 6:45-56","막 7:1-13","막 7:14-23","막 7:24-37"],"3":["마가복음 8:1-13","막 8:14-26","막 8:27-9:1","막 9:2-13","막 9:14-29","막 9:30-37","막 9:38-50","막 10:1-12","막 10:13-22","막 10:23-31","막 10:32-45","막 10:46-52","막 11:1-11","막 11:12-26","막 11:27-12:12","막 12:13-27","막 12:28-34","막 12:35-44","막 13:1-13","막 13:14-27","막 13:28-37","막 14:1-11","막 14:12-21","막 14:22-31","막 14:32-42","막 14:43-52","막 14:53-72","막 15:1-15","막 15:16-32","막 15:33-47","막 16:1-20(부활절)"],"4":["신명기 18:15-22","신 19:1-21","신 20:1-20","신 21:1-23","신 22:1-12","신 22:13-30","신 23:1-18","신 23:19-24:9","신 24:10-22","신 25:1-19","신 26:1-19","신 27:1-26","신 28:1-14","신 28:15-35","신 28:36-57","신 28:58-68","신 29:1-13","신 29:14-29","신 30:1-20","신 31:1-13","신 31:14-29","신 31:30-32:14","신 32:15-33","신 32:34-52","신 33:1-17","신 33:18-34:12","시편 103:1-14","시 103:15-22","시 104:1-18","시 104:19-35"],"5":["사도행전 1:1-11","행 1:12-26","행 2:1-13","행 2:14-36","행 2:37-47","행 3:1-26","행 4:1-12","행 4:13-31","행 4:32-5:11","행 5:12-26","행 5:27-42","행 6:1-15","행 7:1-16","행 7:17-36","행 7:37-53","행 7:54-8:8","행 8:9-25","행 8:26-40","행 9:1-19a","행 9:19b-31","행 9:32-43","행 10:1-16","행 10:17-33","행 10:34-48","행 11:1-18","행 11:19-30","행 12:1-25","행 13:1-12","행 13:13-31","행 13:32-52","행 14:1-18"],"6":["행 14:19-28","행 15:1-11","행 15:12-35","행 15:36-16:15","행 16:16-40","행 17:1-15","행 17:16-34","행 18:1-11","행 18:12-23","행 18:24-19:7","행 19:8-20","행 19:21-41","행 20:1-16","행 20:17-27","행 20:28-38","행 21:1-16","행 21:17-36","행 21:37-22:11","행 22:12-29","행 22:30-23:11","행 23:12-35","행 24:1-23","행 24:24-25:12","행 25:13-27","행 26:1-18","행 26:19-32","행 27:1-20","행 27:21-44","행 28:1-15","행 28:16-31"],"7":["예레미야 26:1-15","렘 26:16-24","렘 27:1-11","렘 27:12-22","렘 28:1-17","렘 29:1-14","렘 29:15-32","렘 30:1-11","렘 30:12-24","렘 31:1-9","렘 31:10-22","렘 31:23-40","렘 32:1-15","렘 32:16-25","렘 32:26-35","렘 32:36-44","렘 33:1-13","렘 33:14-26","렘 34:1-7","렘 34:8-22","렘 35:1-19","렘 36:1-19","렘 36:20-32","렘 37:1-10","렘 37:11-21","렘 38:1-13","렘 38:14-28","렘 39:1-18","렘 40:1-16","렘 41:1-18","렘 42:1-14"],"8":["렘 42:15-22","렘 43:1-13","렘 44:1-14","렘 44:15-30","렘 45:1-46:12","렘 46:13-28","렘 47:1-48:10","렘 48:11-25","렘 48:26-35","렘 48:36-47","렘 49:1-6","렘 49:7-22","렘 49:23-39","렘 50:1-10","렘 50:11-20","렘 50:21-32","렘 50:33-46","렘 51:1-10","렘 51:11-19","렘 51:20-32","렘 51:33-44","렘 51:45-53","렘 51:54-64","렘 52:1-11","렘 52:12-34","시편 105:1-11","시 105:12-23","시 105:24-45","시 106:1-12","시 106:13-31","시 106:32-48"],"9":["열왕기하 1:1-12","왕하 1:13-18","왕하 2:1-14","왕하 2:15-25","왕하 3:1-12","왕하 3:13-27","왕하 4:1-17","왕하 4:18-37","왕하 4:38-44","왕하 5:1-14","왕하 5:15-27","왕하 6:1-14","왕하 6:15-23","왕하 6:24-7:2","왕하 7:3-20","왕하 8:1-15","왕하 8:16-29","왕하 9:1-13","왕하 9:14-26","왕하 9:27-37","왕하 10:1-17","왕하 10:18-36","왕하 11:1-21","왕하 12:1-21","왕하 13:1-13","왕하 13:14-25","왕하 14:1-16","왕하 14:17-29","왕하 15:1-22","왕하 15:23-38"],"10":["왕하 16:1-20","왕하 17:1-23","왕하 17:24-41","왕하 18:1-16","왕하 18:17-37","왕하 19:1-19","왕하 19:20-37","왕하 20:1-11","왕하 20:12-21","왕하 21:1-26","왕하 22:1-20","왕하 23:1-20","왕하 23:21-30","왕하 23:31-24:7","왕하 24:8-25:7","왕하 25:8-30","예레미야애가 1:1-11","애가 1:12-22","애가 2:1-10","애가 2:11-22","애가 3:1-18","애가 3:19-39","애가 3:40-54","애가 3:55-66","애가 4:1-10","애가 4:11-22","애가 5:1-10","애가 5:11-22","시편 107:1-22","시 107:23-43","시 108:1-13"],"11":["디모데전서 1:1-11","딤전 1:12-20","딤전 2:1-7","딤전 2:8-15","딤전 3:1-7","딤전 3:8-16","딤전 4:1-16","딤전 5:1-16","딤전 5:17-6:2","딤전 6:3-10","딤전 6:11-21","디모데후서 1:1-8","딤후 1:9-18","딤후 2:1-13","딤후 2:14-26","딤후 3:1-9","딤후 3:10-17","딤후 4:1-8","딤후 4:9-22","호세아 1:1-11","호 2:1-13","호 2:14-3:5","호 4:1-19","호 5:1-15","호 6:1-11","호 7:1-16","호 8:1-14","호 9:1-17","호 10:1-15","호 11:1-11"],"12":["호 11:12-12:14","호 13:1-16","호 14:1-9","아모스 1:1-2:3","암 2:4-16","암 3:1-8","암 3:9-4:3","암 4:4-13","암 5:1-17","암 5:18-27","암 6:1-14","암 7:1-9","암 7:10-17","암 8:1-14","암 9:1-15","말라기 1:1-14","말 2:1-16","말 2:17-3:12","말 3:13-4:6","시편 109:1-15","시 109:16-31","시 110:1-7","시 111:1-10","시 112:1-10","시 113:1-9(성탄절)","시 114:1-8","시 115:1-18","시 116:1-11","시 116:12-117:2","시 118:1-13","시 118:14-29"]},"2025":{"1":["여호수아 1:1-9","수 1:10-18","수 2:1-24","수 3:1-17","수 4:1-24","수 5:1-12","수 5:13-6:7","수 6:8-27","수 7:1-15","수 7:16-26","수 8:1-17","수 8:18-35","수 9:1-15","수 9:16-27","수 10:1-15","수 10:16-28","수 10:29-43","수 11:1-23","수 12:1-24","수 13:1-14","수 13:15-33","수 14:1-15","수 15:1-19","수 15:20-63","수 16:1-17:6","수 17:7-18","수 18:1-28","수 19:1-23","수 19:24-51","수 20:1-9","수 21:1-19"],"2":["수 21:20-45","수 22:1-9","수 22:10-20","수 22:21-34","수 23:1-16","수 24:1-18","수 24:19-33","누가복음 1:1-25","눅 1:26-56","눅 1:57-80","눅 2:1-20","눅 2:21-40","눅 2:41-52","눅 3:1-14","눅 3:15-38","눅 4:1-13","눅 4:14-30","눅 4:31-44","눅 5:1-11","눅 5:12-26","눅 5:27-39","눅 6:1-11","눅 6:12-26","눅 6:27-38","눅 6:39-49","눅 7:1-17","눅 7:18-35","눅 7:36-50"],"3":["누가복음 8:1-15","눅 8:16-25","눅 8:26-39","눅 8:40-56","눅 9:1-17","눅 9:18-27","눅 9:28-36","눅 9:37-50","눅 9:51-62","눅 10:1-24","눅 10:25-42","눅 11:1-13","눅 11:14-26","눅 11:27-36","눅 11:37-54","눅 12:1-12","눅 12:13-34","눅 12:35-48","눅 12:49-59","눅 13:1-21","눅 13:22-35","눅 14:1-14","눅 14:15-24","눅 14:25-35","눅 15:1-10","눅 15:11-32","눅 16:1-13","눅 16:14-31","눅 17:1-10","눅 17:11-19","눅 17:20-37"],"4":["눅 18:1-14","눅 18:15-30","눅 18:31-43","눅 19:1-10","눅 19:11-27","눅 19:28-48","눅 20:1-18","눅 20:19-40","눅 20:41-21:4","눅 21:5-19","눅 21:20-28","눅 21:29-38","눅 22:1-23","눅 22:24-38","눅 22:39-53","눅 22:54-71","눅 23:1-25","눅 23:26-43","눅 23:44-56","눅 24:1-12(부활절)","눅 24:13-35","눅 24:36-53","아가 1:1-2:7","아 2:8-17","아 3:1-11","아 4:1-5:1","아 5:2-6:3","아 6:4-6:13a","아 6:13b-8:4","아 8:5-14"],"5":["시편 119:1-16","시 119:17-32","시 119:33-48","시 119:49-64","시 119:65-80","시 119:81-96","시 119:97-112","시 119:113-128","시 119:129-144","시 119:145-160","시 119:161-176","에스더 1:1-22","에 2:1-18","에 2:19-3:6","에 3:7-15","에 4:1-17","에 5:1-14","에 6:1-13","에 6:14-7:10","에 8:1-17","에 9:1-19","에 9:20-10:3","빌립보서 1:1-11","빌 1:12-26","빌 1:27-2:4","빌 2:5-18","빌 2:19-30","빌 3:1-11","빌 3:12-21","빌 4:1-9","빌 4:10-23"],"6":["역대상 1:1-54","대상 2:1-55","대상 3:1-4:43","대상 5:1-6:81","대상 7:1-8:40","대상 9:1-34","대상 9:35-10:14","대상 11:1-19","대상 11:20-47","대상 12:1-40","대상 13:1-14","대상 14:1-17","대상 15:1-29","대상 16:1-22","대상 16:23-43","대상 17:1-15","대상 17:16-27","대상 18:1-17","대상 19:1-20:8","대상 21:1-17","대상 21:18-30","대상 22:1-19","대상 23:1-32","대상 24:1-31","대상 25:1-31","대상 26:1-32","대상 27:1-34","대상 28:1-21","대상 29:1-19","대상 29:20-30"],"7":["요한계시록 1:1-8","계 1:9-20","계 2:1-7","계 2:8-17","계 2:18-29","계 3:1-13","계 3:14-22","계 4:1-11","계 5:1-14","계 6:1-17","계 7:1-17","계 8:1-13","계 9:1-12","계 9:13-21","계 10:1-11","계 11:1-13","계 11:14-19","계 12:1-17","계 13:1-10","계 13:11-18","계 14:1-13","계 14:14-20","계 15:1-8","계 16:1-11","계 16:12-21","계 17:1-18","계 18:1-8","계 18:9-19","계 18:20-19:10","계 19:11-21","계 20:1-15"],"8":["계 21:1-8","계 21:9-21","계 21:22-22:5","계 22:6-21","스가랴 1:1-6","슥 1:7-21","슥 2:1-13","슥 3:1-10","슥 4:1-14","슥 5:1-11","슥 6:1-15","슥 7:1-14","슥 8:1-13","슥 8:14-23","슥 9:1-8","슥 9:9-17","슥 10:1-12","슥 11:1-17","슥 12:1-14","슥 13:1-9","슥 14:1-11","슥 14:12-21","시편 120-121","시 122-123","시 124-125","시 126-127","시 128-129","시 130-131","시 132-134","시 135","시 136"],"9":["데살로니가전서 1:1-10","살전 2:1-16","살전 2:17-3:13","살전 4:1-12","살전 4:13-5:11","살전 5:12-28","데살로니가후서 1:1-12","살후 2:1-17","살후 3:1-18","스바냐 1:1-13","습 1:14-2:3","습 2:4-15","습 3:1-8","습 3:9-20","역대하 1:1-17","대하 2:1-18","대하 3:1-17","대하 4:1-22","대하 5:1-14","대하 6:1-11","대하 6:12-25","대하 6:26-42","대하 7:1-22","대하 8:1-16","대하 8:17-9:12","대하 9:13-31","대하 10:1-19","대하 11:1-23","대하 12:1-16","대하 13:1-14:1"],"10":["대하 14:2-15","대하 15:1-19","대하 16:1-14","대하 17:1-19","대하 18:1-27","대하 18:28-19:11","대하 20:1-19","대하 20:20-21:1","대하 21:2-20","대하 22:1-12","대하 23:1-15","대하 23:16-24:16","대하 24:17-27","대하 25:1-13","대하 25:14-28","대하 26:1-23","대하 27:1-28:15","대하 28:16-27","대하 29:1-19","대하 29:20-36","대하 30:1-12","대하 30:13-27","대하 31:1-21","대하 32:1-23","대하 32:24-33","대하 33:1-25","대하 34:1-13","대하 34:14-33","대하 35:1-19","대하 35:20-27","대하 36:1-23"],"11":["에스라 1:1-11","스 2:1-70","스 3:1-13","스 4:1-10","스 4:11-24","스 5:1-17","스 6:1-12","스 6:13-22","스 7:1-10","스 7:11-28","스 8:1-20","스 8:21-36","스 9:1-8","스 9:9-15","스 10:1-8","스 10:9-44","학개 1:1-15","학 2:1-9","학 2:10-23","느헤미야 1:1-11","느 2:1-20","느 3:1-32","느 4:1-23","느 5:1-19","느 6:1-14","느 6:15-7:4","느 7:5-73","느 8:1-18","느 9:1-22","느 9:23-38"],"12":["느 10:1-39","느 11:1-36","느 12:1-26","느 12:27-47","느 13:1-14","느 13:15-31","시편 137","시 138","시 139:1-12","시 139:13-24","시 140","시 141","시 142","시 143","시 144","시 145","시 146","시 147","유다서 1:1-16","유 1:17-25","미가 1:1-16","미 2:1-13","미 3:1-12","미 4:1-13","미 5:1-15(성탄절)","미 6:1-16","미 7:1-13","미 7:14-20","시편 148","시 149","시 150"]},"2026":{"1":["창세기 1:1-13","창 1:14-25","창 1:26-2:3","창 2:4-25","창 3:1-13","창 3:14-24","창 4:1-26","창 5:1-32","창 6:1-22","창 7:1-24","창 8:1-22","창 9:1-17","창 9:18-29","창 10:1-32","창 11:1-9","창 11:10-30","창 11:31-12:9","창 12:10-20","창 13:1-18","창 14:1-24","창 15:1-21","창 16:1-16","창 17:1-27","창 18:1-15","창 18:16-33","창 19:1-11","창 19:12-23","창 19:24-38","창 20:1-18","창 21:1-21","창 21:22-34"],"2":["요한복음 1:1-18","요 1:19-34","요 1:35-51","요 2:1-12","요 2:13-25","요 3:1-15","요 3:16-21","요 3:22-36","요 4:1-14","요 4:15-26","요 4:27-42","요 4:43-54","요 5:1-15","요 5:16-30","요 5:31-47","요 6:1-15","요 6:16-29","요 6:30-40","요 6:41-59","요 6:60-71","요 7:1-13","요 7:14-24","요 7:25-36","요 7:37-52","요 7:53-8:20","요 8:21-30","요 8:31-41","요 8:42-59"],"3":["요한복음 9:1-12","요 9:13-23","요 9:24-41","요 10:1-21","요 10:22-42","요 11:1-16","요 11:17-27","요 11:28-37","요 11:38-46","요 11:47-57","요 12:1-11","요 12:12-19","요 12:20-33","요 12:34-43","요 12:44-50","요 13:1-17","요 13:18-30","요 13:31-38","요 14:1-14","요 14:15-21","요 14:22-31","요 15:1-17","요 15:18-27","요 16:1-15","요 16:16-24","요 16:25-33","요 17:1-16","요 17:17-26","요 18:1-11","요 18:12-27","요 18:28-38"],"4":["요 18:39-19:16","요 19:17-27","요 19:28-30+가상칠언","요 19:31-42","요 20:1-18(부활절)","요 20:19-31","요 21:1-14","요 21:15-25","창세기 22:1-24","창 23:1-20","창 24:1-27","창 24:28-49","창 24:50-67","창 25:1-18","창 25:19-34","창 26:1-11","창 26:12-33","창 26:34-27:14","창 27:15-29","창 27:30-46","창 28:1-22","창 29:1-20","창 29:21-35","창 30:1-24","창 30:25-43","창 31:1-16","창 31:17-35","창 31:36-55","창 32:1-21","창 32:22-32"],"5":["창세기 33:1-20","창 34:1-17","창 34:18-31","창 35:1-22","창 35:23-36:8","창 36:9-43","창 37:1-17","창 37:18-36","창 38:1-30","창 39:1-23","창 40:1-23","창 41:1-24","창 41:25-36","창 41:37-57","창 42:1-17","창 42:18-38","창 43:1-15","창 43:16-34","창 44:1-17","창 44:18-34","창 45:1-15","창 45:16-28","창 46:1-27","창 46:28-47:12","창 47:13-26","창 47:27-48:7","창 48:8-22","창 49:1-15","창 49:16-28","창 49:29-50:14","창 50:15-26"],"6":["고린도전서 1:1-9","고전 1:10-17","고전 1:18-31","고전 2:1-16","고전 3:1-15","고전 3:16-4:5","고전 4:6-21","고전 5:1-13","고전 6:1-11","고전 6:12-20","고전 7:1-24","고전 7:25-40","고전 8:1-13","고전 9:1-23","고전 9:24-10:13","고전 10:14-11:1","고전 11:2-16","고전 11:17-34","고전 12:1-11","고전 12:12-31","고전 13:1-13","고전 14:1-19","고전 14:20-40","고전 15:1-11","고전 15:12-19","고전 15:20-34","고전 15:35-49","고전 15:50-58","고전 16:1-12","고전 16:13-24"],"7":["시편 1:1-6","시 2:1-12","시 3:1-8","시 4:1-8","시 5:1-12","시 6:1-10","시 7:1-17","시 8:1-9","시 9:1-20","시 10:1-18","시 11:1-7","시 12:1-8","시 13:1-6","시 14:1-7","시 15:1-5","이사야 1:1-20","사 1:21-31","사 2:1-22","사 3:1-12","사 3:13-4:6","사 5:1-17","사 5:18-30","사 6:1-13","사 7:1-25","사 8:1-22","사 9:1-7","사 9:8-10:4","사 10:5-19","사 10:20-34","사 11:1-16","사 12:1-6"],"8":["사 13:1-22","사 14:1-23","사 14:24-15:9","사 16:1-14","사 17:1-14","사 18:1-19:15","사 19:16-20:6","사 21:1-17","사 22:1-25","사 23:1-18","사 24:1-13","사 24:14-23","사 25:1-12","사 26:1-27:1","사 27:2-13","사 28:1-13","사 28:14-29","사 29:1-14","사 29:15-24","사 30:1-17","사 30:18-33","사 31:1-9","사 32:1-20","사 33:1-24","사 34:1-17","사 35:1-10","사 36:1-22","사 37:1-20","사 37:21-38","사 38:1-22","사 39:1-8"],"9":["사사기 1:1-10","삿 1:11-21","삿 1:22-36","삿 2:1-10","삿 2:11-23","삿 3:1-11","삿 3:12-31","삿 4:1-10","삿 4:11-24","삿 5:1-18","삿 5:19-31","삿 6:1-10","삿 6:11-24","삿 6:25-40","삿 7:1-14","삿 7:15-25","삿 8:1-21","삿 8:22-35","삿 9:1-6","삿 9:7-21","삿 9:22-45","삿 9:46-57","삿 10:1-18","삿 11:1-11","삿 11:12-28","삿 11:29-40","삿 12:1-15","삿 13:1-14","삿 13:15-25","삿 14:1-20"],"10":["삿 15:1-20","삿 16:1-14","삿 16:15-31","삿 17:1-13","삿 18:1-20","삿 18:21-31","삿 19:1-10","삿 19:11-21","삿 19:22-30","삿 20:1-7","삿 20:8-28","삿 20:29-48","삿 21:1-12","삿 21:13-25","야고보서 1:1-11","약 1:12-18","약 1:19-27","약 2:1-13","약 2:14-26","약 3:1-12","약 3:13-18","약 4:1-12","약 4:13-5:6","약 5:7-12","약 5:13-20","시편 16:1-11","시 17:1-15","시 18:1-15","시 18:16-29","시 18:30-50","시 19:1-14"],"11":["고린도후서 1:1-11","고후 1:12-22","고후 1:23-2:17","고후 3:1-18","고후 4:1-18","고후 5:1-10","고후 5:11-21","고후 6:1-7:1","고후 7:2-16","고후 8:1-15","고후 8:16-24","고후 9:1-15","고후 10:1-18","고후 11:1-15","고후 11:16-33","고후 12:1-13","고후 12:14-21","고후 13:1-13","시편 20:1-9","시 21:1-13","시 22:1-21","시 22:22-31","시 23:1-6","시 24:1-10","시 25:1-22","이사야 40:1-11","사 40:12-31","사 41:1-20","사 41:21-29","사 42:1-25"],"12":["사 43:1-13","사 43:14-28","사 44:1-20","사 44:21-45:7","사 45:8-17","사 45:18-25","사 46:1-13","사 47:1-15","사 48:1-11","사 48:12-22","사 49:1-13","사 49:14-50:3","사 50:4-51:8","사 51:9-16","사 51:17-52:12","사 52:13-53:12","사 54:1-17","사 55:1-13","사 56:1-8","사 56:9-57:13","사 57:14-21","사 58:1-14","사 59:1-21","사 60:1-22","사 61:1-11(성탄절)","사 62:1-12","사 63:1-14","사 63:15-64:12","사 65:1-16","사 65:17-25","사 66:1-24"]},"2027":{"1":["마태복음 1:1-17","마 1:18-25","마 2:1-12","마 2:13-23","마 3:1-12","마 3:13-4:11","마 4:12-25","마 5:1-12","마 5:13-20","마 5:21-32","마 5:33-48","마 6:1-18","마 6:19-34","마 7:1-12","마 7:13-20","마 7:21-29","마 8:1-13","마 8:14-22","마 8:23-34","마 9:1-13","마 9:14-26","마 9:27-38","마 10:1-15","마 10:16-23","마 10:24-33","마 10:34-42","마 11:1-6","마 11:7-19","마 11:20-30","마 12:1-13","마 12:14-21"],"2":["마 12:22-37","마 12:38-50","마 13:1-17","마 13:18-23","마 13:24-30","마 13:31-43","마 13:44-50","마 13:51-58","마 14:1-12","마 14:13-21","마 14:22-36","마 15:1-20","마 15:21-28","마 15:29-39","마 16:1-12","마 16:13-20","마 16:21-28","마 17:1-13","마 17:14-27","마 18:1-10","마 18:11-20","마 18:21-35","마 19:1-12","마 19:13-22","마 19:23-30","마 20:1-16","마 20:17-28","마 20:29-34"],"3":["마태복음 21:1-11","마 21:12-22","마 21:23-32","마 21:33-46","마 22:1-14","마 22:15-22","마 22:23-33","마 22:34-46","마 23:1-12","마 23:13-28","마 23:29-39","마 24:1-14","마 24:15-35","마 24:36-51","마 25:1-13","마 25:14-30","마 25:31-46","마 26:1-16","마 26:17-25","마 26:26-35","마 26:36-56","마 26:57-75","마 27:1-10","마 27:11-26","마 27:27-44","마 27:45-56","마 27:57-66","마 28:1-10(부활절)","마 28:11-20","시편 26:1-12","시 27:1-14"],"4":["출애굽기 1:1-22","출 2:1-10","출 2:11-25","출 3:1-12","출 3:13-22","출 4:1-17","출 4:18-31","출 5:1-21","출 5:22-6:13","출 6:14-7:7","출 7:8-25","출 8:1-15","출 8:16-32","출 9:1-12","출 9:13-35","출 10:1-20","출 10:21-29","출 11:1-10","출 12:1-20","출 12:21-36","출 12:37-51","출 13:1-22","출 14:1-14","출 14:15-31","출 15:1-21","출 15:22-16:21","출 16:22-36","출 17:1-16","출 18:1-12","출 18:13-27"],"5":["잠언 1:1-7","잠 1:8-19","잠 1:20-33","잠 2:1-15","잠 2:16-22","잠 3:1-10","잠 3:11-35","잠 4:1-9","잠 4:10-27","잠 5:1-23","잠 6:1-19","잠 6:20-35","잠 7:1-9","잠 7:10-27","잠 8:1-21","잠 8:22-36","잠 9:1-18","잠 10:1-17","잠 10:18-32","잠 11:1-15","잠 11:16-31","잠 12:1-14","잠 12:15-28","잠 13:1-13","잠 13:14-25","잠 14:1-19","잠 14:20-35","잠 15:1-18","잠 15:19-33","잠 16:1-15","잠 16:16-33"],"6":["잠 17:1-14","잠 17:15-28","잠 18:1-12","잠 18:13-24","잠 19:1-14","잠 19:15-29","잠 20:1-15","잠 20:16-30","잠 21:1-14","잠 21:15-31","잠 22:1-16","잠 22:17-29","잠 23:1-14","잠 23:15-35","잠 24:1-22","잠 24:23-34","잠 25:1-14","잠 25:15-28","잠 26:1-16","잠 26:17-28","잠 27:1-13","잠 27:14-27","잠 28:1-18","잠 28:19-28","잠 29:1-14","잠 29:15-27","잠 30:1-17","잠 30:18-33","잠 31:1-9","잠 31:10-31"],"7":["베드로전서 1:1-12","벧전 1:13-25","벧전 2:1-10","벧전 2:11-25","벧전 3:1-12","벧전 3:13-22","벧전 4:1-11","벧전 4:12-19","벧전 5:1-14","에스겔 1:1-14","겔 1:15-28","겔 2:1-10","겔 3:1-15","겔 3:16-27","겔 4:1-17","겔 5:1-17","겔 6:1-14","겔 7:1-13","겔 7:14-27","겔 8:1-18","겔 9:1-11","겔 10:1-22","겔 11:1-13","겔 11:14-25","겔 12:1-16","겔 12:17-28","겔 13:1-23","겔 14:1-23","겔 15:1-16:14","겔 16:15-34","겔 16:35-52"],"8":["겔 16:53-63","겔 17:1-10","겔 17:11-24","겔 18:1-18","겔 18:19-32","겔 19:1-14","겔 20:1-26","겔 20:27-39","겔 20:40-49","겔 21:1-17","겔 21:18-32","겔 22:1-16","겔 22:17-31","겔 23:1-21","겔 23:22-35","겔 23:36-49","겔 24:1-14","겔 24:15-27","겔 25:1-17","겔 26:1-21","겔 27:1-36","겔 28:1-26","겔 29:1-21","겔 30:1-26","겔 31:1-18","겔 32:1-16","겔 32:17-32","시편 28:1-9","시 29:1-11","시 30:1-12","시 31:1-24"],"9":["골로새서 1:1-14","골 1:15-23","골 1:24-2:5","골 2:6-15","골 2:16-23","골 3:1-11","골 3:12-4:1","골 4:2-18","빌레몬서 1:1-16","몬 1:17-25","베드로후서 1:1-11","벧후 1:12-21","벧후 2:1-10a","벧후 2:10b-22","벧후 3:1-7","벧후 3:8-18","시편 32:1-11","시 33:1-22","시 34:1-22","시 35:1-18","시 35:19-28","출애굽기 19:1-13","출 19:14-25","출 20:1-17","출 20:18-26","출 21:1-11","출 21:12-36","출 22:1-15","출 22:16-31","출 23:1-19"],"10":["출 23:20-33","출 24:1-18","출 25:1-22","출 25:23-40","출 26:1-37","출 27:1-21","출 28:1-14","출 28:15-43","출 29:1-18","출 29:19-34","출 29:35-46","출 30:1-16","출 30:17-38","출 31:1-18","출 32:1-14","출 32:15-35","출 33:1-11","출 33:12-23","출 34:1-17","출 34:18-35","출 35:1-19","출 35:20-29","출 35:30-36:7","출 36:8-38","출 37:1-29","출 38:1-20","출 38:21-31","출 39:1-21","출 39:22-43","출 40:1-16","출 40:17-38"],"11":["갈라디아서 1:1-10","갈 1:11-24","갈 2:1-10","갈 2:11-21","갈 3:1-9","갈 3:10-18","갈 3:19-29","갈 4:1-11","갈 4:12-20","갈 4:21-31","갈 5:1-15","갈 5:16-26","갈 6:1-10","갈 6:11-18","하박국 1:1-11","합 1:12-2:1","합 2:2-11","합 2:12-20","합 3:1-19","시편 36:1-12","시 37:1-22","시 37:23-40","시 38:1-22","시 39:1-13","시 40:1-17","시 41:1-13","시 42:1-11","시 43:1-5","시 44:1-26","시 45:1-17"],"12":["에스겔 33:1-20","겔 33:21-33","겔 34:1-16","겔 34:17-31","겔 35:1-15","겔 36:1-15","겔 36:16-38","겔 37:1-14","겔 37:15-28","겔 38:1-23","겔 39:1-29","겔 40-42장","겔 43:1-27","겔 44:1-31","겔 45:1-17","겔 45:18-46:24","겔 47:1-12","겔 47:13-48:35","요 1:1-18","눅 1:26-38","사 9:1-7","엡 2:11-18","빌 2:5-11","히 2:10-3:1","눅 2:8-20(성탄절)","요엘 1:1-12","욜 1:13-20","욜 2:1-17","욜 2:18-32","욜 3:1-8","욜 3:9-21"]}};
+const RP_ABBR={"창세기":"genesis","창":"genesis","출애굽기":"exodus","출":"exodus","레위기":"leviticus","레":"leviticus","민수기":"numbers","민":"numbers","신명기":"deuteronomy","신":"deuteronomy","여호수아":"joshua","수":"joshua","사사기":"judges","삿":"judges","룻기":"ruth","룻":"ruth","사무엘상":"1samuel","삼상":"1samuel","사무엘하":"2samuel","삼하":"2samuel","열왕기상":"1kings","왕상":"1kings","열왕기하":"2kings","왕하":"2kings","역대상":"1chronicles","대상":"1chronicles","역대하":"2chronicles","대하":"2chronicles","에스라":"ezra","스":"ezra","느헤미야":"nehemiah","느":"nehemiah","에스더":"esther","에":"esther","욥기":"job","욥":"job","시편":"psalms","시":"psalms","잠언":"proverbs","잠":"proverbs","전도서":"ecclesiastes","전":"ecclesiastes","아가":"songofsolomon","아":"songofsolomon","이사야":"isaiah","사":"isaiah","예레미야":"jeremiah","렘":"jeremiah","예레미야애가":"lamentations","애":"lamentations","에스겔":"ezekiel","겔":"ezekiel","다니엘":"daniel","단":"daniel","호세아":"hosea","호":"hosea","요엘":"joel","욜":"joel","아모스":"amos","암":"amos","오바댜":"obadiah","옵":"obadiah","요나":"jonah","욘":"jonah","미가":"micah","미":"micah","나훔":"nahum","나":"nahum","하박국":"habakkuk","합":"habakkuk","스바냐":"zephaniah","습":"zephaniah","학개":"haggai","학":"haggai","스가랴":"zechariah","슥":"zechariah","말라기":"malachi","말":"malachi","마태복음":"matthew","마":"matthew","마가복음":"mark","막":"mark","누가복음":"luke","눅":"luke","요한복음":"john","요":"john","사도행전":"acts","행":"acts","로마서":"romans","롬":"romans","고린도전서":"1corinthians","고전":"1corinthians","고린도후서":"2corinthians","고후":"2corinthians","갈라디아서":"galatians","갈":"galatians","에베소서":"ephesians","엡":"ephesians","빌립보서":"philippians","빌":"philippians","골로새서":"colossians","골":"colossians","데살로니가전서":"1thessalonians","살전":"1thessalonians","데살로니가후서":"2thessalonians","살후":"2thessalonians","디모데전서":"1timothy","딤전":"1timothy","디모데후서":"2timothy","딤후":"2timothy","디도서":"titus","딛":"titus","빌레몬서":"philemon","몬":"philemon","히브리서":"hebrews","히":"hebrews","야고보서":"james","약":"james","베드로전서":"1peter","벧전":"1peter","베드로후서":"2peter","벧후":"2peter","요한일서":"1john","요일":"1john","요한이서":"2john","요이":"2john","요한삼서":"3john","요삼":"3john","유다서":"jude","유":"jude","요한계시록":"revelation","계":"revelation","애가":"lamentations"};
+let planY,planM;
+function parseRP(str){
+  // 예: "창 1:26-2:3", "행 9:1-19a", "시 120-121", "시 135", "겔 40-42장"
+  const m=str.match(/^(\S+)\s+(\d+)(?::(\d+)[ab]?)?/);
+  if(!m||!RP_ABBR[m[1]])return null;
+  return {book:RP_ABBR[m[1]],ch:+m[2],v:m[3]?+m[3]:1};
+}
+function openPlan(){
+  const t=new Date();planY=t.getFullYear();planM=t.getMonth()+1;
+  if(!RP_DATA[planY]){const ys=Object.keys(RP_DATA).map(Number).sort();
+    if(planY<ys[0]){planY=ys[0];planM=1;}else{planY=ys[ys.length-1];planM=12;}}
+  renderPlan(true);
+  document.getElementById('plan-modal').classList.add('open');
+}
+function closePlan(){document.getElementById('plan-modal').classList.remove('open');}
+function planShift(d){
+  let y=planY,m=planM+d;
+  if(m<1){m=12;y--;} if(m>12){m=1;y++;}
+  if(!RP_DATA[y])return;
+  planY=y;planM=m;renderPlan(false);
+}
+function renderPlan(scrollToday){
+  const pm=planM===1?12:planM-1, nm=planM===12?1:planM+1;
+  const hasPrev=!!RP_DATA[planM===1?planY-1:planY], hasNext=!!RP_DATA[planM===12?planY+1:planY];
+  document.getElementById('plan-nav').innerHTML=
+    `<button type="button" class="pn-side" ${hasPrev?'':'disabled'} onclick="planShift(-1)">${pm}월</button>
+     <button type="button" class="pn-arr" ${hasPrev?'':'disabled'} onclick="planShift(-1)">‹</button>
+     <span class="pn-cur">${planY}년 ${planM}월</span>
+     <button type="button" class="pn-arr" ${hasNext?'':'disabled'} onclick="planShift(1)">›</button>
+     <button type="button" class="pn-side" ${hasNext?'':'disabled'} onclick="planShift(1)">${nm}월</button>`;
+  const list=RP_DATA[planY][planM]||[];
+  const t=new Date(),W=['일','월','화','수','목','금','토'];
+  document.getElementById('plan-list').innerHTML=list.map((txt,i)=>{
+    const d=i+1,dt=new Date(planY,planM-1,d),w=dt.getDay();
+    const today=(t.getFullYear()===planY&&t.getMonth()+1===planM&&t.getDate()===d);
+    return `<button type="button" class="plan-row${today?' today':''}${w===0?' sun':''}" data-i="${i}">
+      <span class="pr-d">${d}</span><span class="pr-w">${W[w]}</span><span class="pr-t">${txt}</span>${today?'<span class="pr-tag">오늘</span>':''}</button>`;
+  }).join('');
+  document.querySelectorAll('#plan-list .plan-row').forEach(b=>b.onclick=()=>openPlanDay(list[+b.dataset.i]));
+  const box=document.getElementById('plan-list');
+  const td=box.querySelector('.today');
+  if(scrollToday&&td)setTimeout(()=>td.scrollIntoView({block:'center'}),30); else box.scrollTop=0;
+}
+function openPlanDay(txt){
+  const r=parsePlan(txt);if(!r)return;
+  closePlan();
+  const tr=panels.length?panels[0].getState().trans:'kor';
+  const useTr=['kor','saebeon','esv','niv','NKJV','kjv','asv','web'].includes(tr)?tr:'kor';
+  let p;
+  if(panels.length<MAX_PANELS){createPanel(r.book,r.ch,useTr);p=panels[panels.length-1];}
+  else p=panels[panels.length-1];
+  p.setBookChapter(r.book,r.ch,useTr,r.v,true);
+  saveSession();
+  setTimeout(()=>p.el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}),60);
+}
+function parsePlan(t){return parseRP(t);}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='plan-modal')closePlan();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePlan();});
+function openHelp(){document.getElementById('help-modal').classList.add('open');}
+function closeHelp(){document.getElementById('help-modal').classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='help-modal')closeHelp();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp();});
+function openSync(){
+  // 상단: 현재 창들의 본문(같은 책·장은 하나로)
+  const seen=new Map();
+  panels.forEach(p=>{
+    const {bookId,chapter,trans}=p.getState();
+    const k=bookId+'|'+chapter;
+    const tl=(TRANS.find(t=>t.id===trans)||{l:trans}).l;
+    if(!seen.has(k))seen.set(k,{bookId,chapter,trs:[tl]});
+    else if(!seen.get(k).trs.includes(tl))seen.get(k).trs.push(tl);
+  });
+  document.getElementById('sync-list').innerHTML=[...seen.values()].map(o=>
+    `<button type="button" class="sync-item" data-book="${o.bookId}" data-ch="${o.chapter}">
+       <span class="sync-ref">${BMAP[o.bookId].ko} ${o.chapter}장</span>
+       <span class="sync-tr">${o.trs.join(' · ')}</span></button>`).join('');
+  // 하단: 역본 체크박스
+  const on=syncChecked();
+  document.getElementById('sync-trans').innerHTML=TRANS.map(t=>
+    `<label class="sync-ck"><input type="checkbox" value="${t.id}"${on.includes(t.id)?' checked':''}>${t.l}</label>`).join('');
+  document.querySelectorAll('#sync-trans input').forEach(cb=>cb.onchange=()=>{
+    const v=[...document.querySelectorAll('#sync-trans input:checked')].map(x=>x.value);
+    try{localStorage.setItem(SYNC_KEY,JSON.stringify(v));}catch(e){}
+  });
+  document.querySelectorAll('#sync-list .sync-item').forEach(b=>b.onclick=()=>runSync(b.dataset.book,+b.dataset.ch));
+  document.getElementById('sync-modal').classList.add('open');
+}
+function closeSync(){document.getElementById('sync-modal').classList.remove('open');}
+function runSync(bookId,chapter){
+  const on=[...document.querySelectorAll('#sync-trans input:checked')].map(x=>x.value);
+  const list=TRANS.filter(t=>on.includes(t.id)&&transFits(t,bookId)).map(t=>t.id).slice(0,MAX_PANELS);
+  if(!list.length){alertSync('역본을 하나 이상 체크해 주세요.');return;}
+  closeSync();
+  list.forEach((tr,i)=>{
+    if(i<panels.length)panels[i].setBookChapter(bookId,chapter,tr);
+    else createPanel(bookId,chapter,tr,true);
+  });
+  panels.slice(list.length).map(p=>p.id).forEach(id=>removePanel(id));
+  updateUI();saveSession();
+  document.getElementById('panels-wrap').scrollTo({left:0,behavior:'smooth'});
+}
+function alertSync(msg){const m=document.getElementById('sync-msg');m.textContent=msg;setTimeout(()=>{m.textContent='';},2500);}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='sync-modal')closeSync();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSync();});
+function updateUI(){
+  document.getElementById('add-panel-btn').disabled=panels.length>=MAX_PANELS;
+  panels.forEach(p=>p.renderBar());
+}
+
+
+
+// ── Session persistence ──
+const QS=new URLSearchParams(location.search);
+const POPUP=QS.get('pop')==='1';
+function saveSession(){
+  if(POPUP) return;
+  const data=panels.map(p=>{const s=p.getState();return{bookId:s.bookId,chapter:s.chapter,trans:s.trans};});
+  try{localStorage.setItem('bible_session',JSON.stringify(data));}catch(e){}
+}
+
+
+// ── Background Preload ──
+const LOCAL_TRANS=['kor','saebeon','esv','niv'];
+async function preloadAllBooks(transId){
+  const tr=TRANS.find(t=>t.id===transId);
+  if(!tr||tr.src!=='local') return;
+  const allBooks=[...OT,...NT];
+  // Fetch all books in parallel (batches of 10 to avoid overwhelming)
+  const batchSize=10;
+  for(let i=0;i<allBooks.length;i+=batchSize){
+    const batch=allBooks.slice(i,i+batchSize);
+    await Promise.all(batch.map(async([bookId])=>{
+      const key=`${tr.fid}_${bookId}`;
+      if(cache[key]) return;
+      try{
+        const url=tr.fid==='kor'?`bible/${bookId}.json`:`bible/${bookId}_${tr.fid}.json`;
+        const r=await fetch(url,{cache:'no-cache'});
+        if(r.ok) cache[key]=await r.json();
+      }catch(e){}
+    }));
+  }
+}
+
+function startBackgroundPreload(){
+  // Preload the trans of each open panel, sequentially per trans
+  const transSet=new Set(panels.map(p=>p.getState().trans).filter(t=>LOCAL_TRANS.includes(t)));
+  let chain=Promise.resolve();
+  transSet.forEach(t=>{chain=chain.then(()=>preloadAllBooks(t));});
+}
+
+function loadSession(){
+  try{
+    const raw=localStorage.getItem('bible_session');
+    if(!raw) return null;
+    const data=JSON.parse(raw);
+    if(!Array.isArray(data)||data.length===0) return null;
+    return data;
+  }catch(e){return null;}
+}
+
+
+const saved=POPUP?null:loadSession();
+if(POPUP){
+  createPanel(QS.get('book')||'john', parseInt(QS.get('ch')||'1',10), QS.get('trans')||'kor');
+  startBackgroundPreload();
+} else if(saved){
+  saved.forEach(s=>createPanel(s.bookId||'john', s.chapter||1, s.trans||'kor'));
+  startBackgroundPreload();
+} else {
+  createPanel('genesis',1);
+  createPanel('john',1);
+  startBackgroundPreload();
+}
+document.getElementById('wrap-btn').classList.add('active');
+</script>
+
+<script>
+// ── Search ──
+
+function openSearch(){
+  // Populate trans selector with only local translations
+  const sel=document.getElementById('search-trans');
+  sel.innerHTML=TRANS.filter(t=>LOCAL_TRANS.includes(t.id))
+    .map(t=>`<option value="${t.id}">${t.l}</option>`).join('');
+  // Default to first panel's trans if available
+  if(panels.length>0){
+    const pt=panels[0].getState().trans;
+    if(LOCAL_TRANS.includes(pt)) sel.value=pt;
+  }
+  document.getElementById('search-input').value='';
+  document.getElementById('search-results').innerHTML='';
+  const preloadedCount=TRANS.filter(t=>LOCAL_TRANS.includes(t.id)).reduce((acc,t)=>{
+    const loaded=[...OT,...NT].filter(([id])=>cache[`${t.fid}_${id}`]).length;
+    return acc+(loaded===66?1:0);
+  },0);
+  const totalLocal=TRANS.filter(t=>LOCAL_TRANS.includes(t.id)).length;
+  const readyMsg=preloadedCount>0?` (${preloadedCount}/${totalLocal}개 역본 캐시됨)`:'';
+  document.getElementById('search-status').textContent='로컬 역본(개역개정·새번역·ESV·NIV)만 전권 검색 가능합니다.'+readyMsg;
+  document.getElementById('search-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('search-input').focus(),100);
+}
+
+function closeSearch(){
+  document.getElementById('search-modal').classList.remove('open');
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeSearch();
+  if(e.key==='Enter'&&document.getElementById('search-modal').classList.contains('open')) doSearch();
+});
+// 검색창 바깥(어두운 배경) 클릭 시 닫기 — search-modal이 이 스크립트보다 뒤에 있어 document에 위임
+document.addEventListener('click',e=>{
+  if(e.target&&e.target.id==='search-modal') closeSearch();
+});
+
+async function doSearch(){
+  const q=document.getElementById('search-input').value.trim();
+  const transId=document.getElementById('search-trans').value;
+  const tr=TRANS.find(t=>t.id===transId);
+  if(!q){document.getElementById('search-status').textContent='검색어를 입력해 주세요.';return;}
+
+  const status=document.getElementById('search-status');
+  const resultsEl=document.getElementById('search-results');
+  status.textContent='검색 중...';
+  resultsEl.innerHTML='';
+
+  const allBooks=[...OT,...NT];
+  const results=[];
+  const qLower=q.toLowerCase();
+
+  // If not yet preloaded, fetch remaining books in parallel first
+  const missing=allBooks.filter(([bookId])=>!cache[`${tr.fid}_${bookId}`]);
+  if(missing.length>0){
+    status.textContent=`캐시 로드 중... (${missing.length}권)`;
+    await Promise.all(missing.map(async([bookId])=>{
+      const key=`${tr.fid}_${bookId}`;
+      try{
+        const url=tr.fid==='kor'?`bible/${bookId}.json`:`bible/${bookId}_${tr.fid}.json`;
+        const r=await fetch(url,{cache:'no-cache'});
+        if(r.ok) cache[key]=await r.json();
+      }catch(e){}
+    }));
+  }
+  status.textContent='검색 중...';
+  // Now search entirely in memory — no more awaits needed
+  for(const [bookId,bookKo] of allBooks){
+    const key=`${tr.fid}_${bookId}`;
+    const bookData=cache[key];
+    if(!bookData) continue;
+    for(const [chStr,verses] of Object.entries(bookData.chapters)){
+      for(const {n,t} of verses){
+        if(t&&t.toLowerCase().includes(qLower)){
+          results.push({bookId,bookKo,ch:parseInt(chStr),v:n,t});
+          if(results.length>=300) break;
+        }
+      }
+      if(results.length>=300) break;
+    }
+    if(results.length>=300) break;
+  }
+
+  const count=results.length;
+  status.textContent=count===0?'검색 결과가 없습니다.':`${count}건${count>=300?' (최대 300건)':''} — 클릭하면 해당 패널로 이동`;
+
+  if(count===0){
+    resultsEl.innerHTML='<div class="sr-none">일치하는 본문이 없습니다.</div>';
+    return;
+  }
+
+  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const re=new RegExp(`(${esc(q)})`,'gi');
+
+  resultsEl.innerHTML=results.map((r,i)=>`
+    <div class="sr-item" data-i="${i}">
+      <div class="sr-ref">${r.bookKo} ${r.ch}:${r.v}</div>
+      <div class="sr-text">${r.t.replace(re,'<mark>$1</mark>')}</div>
+    </div>`).join('');
+
+  resultsEl.querySelectorAll('.sr-item').forEach(el=>{
+    el.onclick=()=>{
+      const {bookId,ch,v}=results[+el.dataset.i];
+      const transId=document.getElementById('search-trans').value;
+      if(panels.length>0){
+        panels[0].setBookChapter(bookId,ch,transId,v);
+      }
+      closeSearch();
+    };
+  });
+}
+
+</script>
+
+<script>
+// ── 서비스 워커 + 새 버전 알림 (YB-EverNote 방식) ──
+function showUpdateToast(worker){
+  const t=document.getElementById('update-toast');
+  t.hidden=false;
+  const btn=document.getElementById('update-btn');
+  btn.disabled=false;btn.textContent='새로고침';
+  btn.onclick=async()=>{
+    btn.disabled=true;btn.textContent='적용 중…';
+    // 누르는 시점의 '대기 중인 새 버전'에 신호 (그 사이 더 새 버전이 왔을 수 있음)
+    let w=worker;
+    try{const reg=await navigator.serviceWorker.getRegistration();if(reg&&reg.waiting)w=reg.waiting;}catch(e){}
+    try{w.postMessage('skipWaiting');}catch(e){}
+    // 신호가 먹히지 않아도 2초 뒤에는 무조건 새로고침
+    setTimeout(()=>{try{saveSession();}catch(e){}location.reload();},2000);
+  };
+}
+if('serviceWorker' in navigator){
+  let reloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloading)return; reloading=true;
+    if(typeof saveSession==='function'){try{saveSession();}catch(e){}}
+    location.reload();
+  });
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      if(reg.waiting&&navigator.serviceWorker.controller) showUpdateToast(reg.waiting);
+      reg.addEventListener('updatefound',()=>{
+        const w=reg.installing;
+        w&&w.addEventListener('statechange',()=>{
+          if(w.state==='installed'&&navigator.serviceWorker.controller) showUpdateToast(w);
+        });
+      });
+      // 앱을 켜 둔 채로 다시 화면에 돌아오면 새 버전 확인 + 1시간마다 확인
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{});});
+      setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+    }).catch(e=>console.log('SW 등록 실패:',e));
+  });
+}
+</script>
+
+<div id="more-menu" hidden></div>
+
+<div id="plan-modal">
+  <div id="plan-box">
+    <div class="help-head"><span>매일성경 읽기표</span><button type="button" class="sync-x" onclick="closePlan()">✕</button></div>
+    <div id="plan-nav"></div>
+    <div id="plan-list"></div>
+    <div class="plan-foot">날짜를 누르면 그 본문이 새 창으로 열립니다 · 출처: 성서유니온 매일성경</div>
+  </div>
+</div>
+
+<div id="help-modal">
+  <div id="help-box">
+    <div class="help-head"><span>1426 다본문 성경 · 사용 안내</span><button type="button" class="sync-x" onclick="closeHelp()">✕</button></div>
+    <div class="help-body">
+      <h4>상단 메뉴</h4>
+      <table>
+        <tr><th>🔍 검색</th><td>개역개정·새번역·ESV·NIV에서 단어를 찾습니다. 결과를 누르면 첫 번째 창에서 그 절로 이동합니다.</td></tr>
+        <tr><th>색상 모드</th><td>Bright · Bright2 · Dark1 · Dark2 중 선택. ‘시스템 설정 사용’은 기기 설정에 따라 Bright2/Dark2로 바뀝니다. 기기마다 따로 기억합니다.</td></tr>
+        <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고 시작 절로 이동합니다.</td></tr>
+        <tr><th>로그인</th><td>Google 계정으로 로그인합니다. 허용된 계정만 쓸 수 있고, 로그인해야 형광펜이 저장됩니다.</td></tr>
+      </table>
+      <h4>보기 설정</h4>
+      <table>
+        <tr><th>폰트 · 크기</th><td>본문 글씨체와 크기(▼▲)를 바꿉니다. 기기마다 따로 기억합니다.</td></tr>
+        <tr><th>줄바꿈</th><td>누를 때마다 ‘줄바꿈(절마다 한 줄)’과 ‘이어쓰기(문단처럼)’가 바뀝니다.</td></tr>
+        <tr><th>연동</th><td>열린 창의 본문 목록이 뜹니다. 하나를 고르면 아래에 체크한 역본들로 같은 본문을 나란히 펼칩니다. 체크 상태는 기기마다 기억합니다. 한 번에 최대 10개 역본까지 펼칩니다.</td></tr>
+        <tr><th>본문+</th><td>성경 창을 하나 더 엽니다(최대 10개). 창 하나는 최대 840px 폭이며, 창이 적으면 화면 가운데에 모이고 많으면 좌우로 넘겨 봅니다.</td></tr>
+      </table>
+      <h4>각 창 상단</h4>
+      <table>
+        <tr><th>역본 · 책</th><td>창마다 역본과 책을 따로 고릅니다.</td></tr>
+        <tr><th>‹ 장 ›</th><td>앞뒤 장으로 이동합니다. 가운데 숫자를 누르면 장 목록이 열립니다.</td></tr>
+        <tr><th>✕</th><td>그 창을 닫습니다(창이 둘 이상일 때).</td></tr>
+      </table>
+      <h4>본문에서</h4>
+      <table>
+        <tr><th>절 누르기</th><td>형광펜을 칠하거나 지웁니다. 칠한 절이 있으면 창 상단에 ‘복사’ 버튼이 생깁니다.</td></tr>
+        <tr><th>절 길게 누르기</th><td>복사 모드가 켜집니다. 고른 절은 절 번호가 붉은 원으로 표시되며, 여러 절을 눌러 고른 뒤 ‘복사’를 누릅니다.</td></tr>
+      </table>
+      <h4>그 밖에</h4>
+      <table>
+        <tr><th>스마트폰</th><td>화면이 좁으면 검색 · 안내 · 줄바꿈 · 로그인(로그아웃)이 오른쪽 위 ⋮ 메뉴 안으로 들어갑니다.</td></tr>
+        <tr><th>새 버전 알림</th><td>업데이트가 있으면 화면 아래에 ‘새로고침’ 안내가 뜹니다. 누르면 바로 적용됩니다.</td></tr>
+        <tr><th>이어 보기</th><td>마지막에 열어 둔 창(역본·책·장)은 다음에 열 때 그대로 복원됩니다.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="sync-modal">
+  <div id="sync-box">
+    <div class="sync-head"><span>연동 · 본문을 고르면 체크한 역본으로 펼칩니다</span><button type="button" class="sync-x" onclick="closeSync()">✕</button></div>
+    <div id="sync-list"></div>
+    <div class="sync-sub">역본 <span id="sync-msg"></span></div>
+    <div id="sync-trans"></div>
+  </div>
+</div>
+
+<div id="search-modal">
+  <div id="search-box">
+    <div id="search-header">
+      <select id="search-trans"></select>
+      <input id="search-input" type="text" placeholder="검색어를 입력하세요..." autocomplete="off">
+      <button id="search-go" onclick="doSearch()">검색</button>
+      <button id="search-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div id="search-status"></div>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<script>
+/* ── Google 로그인 ── */
+const sbClient = window.supabase.createClient(SB_URL, SB_KEY, {
+  auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+});
+
+function authLabel(txt,title){
+  const b=document.getElementById('auth-btn');
+  if(!b) return;
+  b.textContent=txt;
+  b.title=title||'';
+}
+
+async function applySession(session){
+  if(session && session.user){
+    authUser  = session.user;
+    authToken = session.access_token;
+    // 허용 이메일 확인
+    try{
+      const r=await fetch(SB_URL+'/rest/v1/allowed_users?select=email&email=eq.'+encodeURIComponent(authUser.email),{headers:sbH()});
+      const rows = r.ok ? await r.json() : [];
+      authAllowed = Array.isArray(rows) && rows.length>0;
+    }catch(e){ authAllowed=false; }
+
+    if(authAllowed){
+      authLabel('로그아웃', authUser.email);
+    }else{
+      authLabel('로그아웃', authUser.email+' (미등록)');
+      alert('등록되지 않은 계정입니다.\n\n'+authUser.email+'\n\n본문 읽기는 가능하지만 형광펜은 저장되지 않습니다.');
+    }
+  }else{
+    authUser=null; authToken=null; authAllowed=false;
+    authLabel('로그인','');
+  }
+  panels.forEach(p=>p.reload());
+}
+
+async function authClick(){
+  if(authUser){
+    if(!confirm('로그아웃할까요?')) return;
+    await sbClient.auth.signOut();
+    applySession(null);
+    return;
+  }
+  const back = location.origin + location.pathname + location.search;
+  const { error } = await sbClient.auth.signInWithOAuth({
+    provider:'google',
+    options:{ redirectTo: back }
+  });
+  if(error) alert('로그인 실패: '+error.message);
+}
+
+(async function initAuth(){
+  try{
+    const { data } = await sbClient.auth.getSession();
+    await applySession(data.session);
+  }catch(e){ authLabel('로그인',''); }
+  sbClient.auth.onAuthStateChange(function(evt, session){
+    if(evt==='SIGNED_IN'||evt==='SIGNED_OUT'||evt==='TOKEN_REFRESHED') applySession(session);
+  });
+})();
+
+/* verse click → Supabase sync */
+document.getElementById('panels').addEventListener('click',function(e){
+  const row=e.target.closest('.verse-row')||e.target.closest('.vi');
+  if(!row)return;
+  const panelEl=row.closest('.panel');
+  if(!panelEl)return;
+  const pData=panels.find(p=>p.el===panelEl);
+  if(!pData)return;
+  const st=pData.getState();
+  const v=+row.dataset.v;
+  setTimeout(function(){
+    if(row.classList.contains('hl')){sbSave(st.trans,st.bookId,st.chapter,v);}
+    else{sbDel(st.trans,st.bookId,st.chapter,v);}
+  },0);
+},true);
+</script>
+
+<div id="update-toast" class="update-toast" hidden>새 버전이 준비되었습니다. <button type="button" id="update-btn">새로고침</button></div>
+</body>
+</html>
