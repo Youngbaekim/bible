@@ -556,7 +556,7 @@ body.bright2 #more-menu button:active,body.bright2 #more-menu button:hover{backg
 
 /* ── 장 이어 보기 ── */
 .panel-text{position:relative}
-.ch-block+.ch-block{margin-top:1.8em}
+.ch-block+.ch-block{margin-top:var(--chgap,77px)} /* 장과 장 사이 본문 3줄 높이 */
 /* ── 매일성경 범위 표시선 ── */
 .rp-line{position:relative;height:0;border-top:2px solid #f03e3e;margin:10px 0 8px;clear:both}
 .rp-tag{position:absolute;right:0;bottom:3px;font-size:11px;font-weight:700;color:#f03e3e;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;line-height:1}
@@ -571,6 +571,11 @@ body.dark .rp-tag,body.dark2 .rp-tag{color:#ff6b6b}
 .sr-jump .sr-text{font-weight:700}
 body.dark .sr-jump,body.dark2 .sr-jump{background:#24304a}
 body.bright2 .sr-jump{background:#ede4d0}
+
+/* ── 장 이름: 은은하지만 구분되게 ── */
+.ch-label{font-size:13px;font-weight:700;letter-spacing:1px;color:#4f46e5;font-family:'Noto Sans KR',sans-serif;padding-bottom:5px;margin-bottom:14px;border-bottom:1px solid rgba(79,70,229,.25)}
+body.dark .ch-label,body.dark2 .ch-label{color:#8fb0e6;letter-spacing:1px;border-color:rgba(143,176,230,.25)}
+body.bright2 .ch-label{color:#8a6030;letter-spacing:1px;border-color:rgba(138,96,48,.3)}
 /* ── 새 버전 알림 ── */
 .update-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;border-radius:12px;background:#16202b;color:#fff;font-size:14px;font-family:'Pretendard Variable',Pretendard,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
 .update-toast[hidden]{display:none}
@@ -772,7 +777,9 @@ document.getElementById('size-down').onclick=()=>{if(gSize>10){gSize--;document.
 function vMB(){return Math.round(gSize*0.35)+'px';}
 function vPT(){return Math.round(gSize*0.14)+'px';}
 function vFN(){return Math.round(gSize*0.84)+'px';}
+function setChGap(){document.querySelectorAll('.panel-text').forEach(t=>t.style.setProperty('--chgap',Math.round(gSize*curLH()*3)+'px'));}
 function applyGlobal(){
+  setChGap();
   // 줄바꿈 모드: .verse-text
   document.querySelectorAll('.verse-text').forEach(e=>{e.style.fontFamily=gFont;e.style.fontSize=gSize+'px';e.style.lineHeight=curLH();});
   // 이어쓰기 모드: .verse-para
@@ -973,7 +980,7 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
     });
     if(curSec.verses.length>0)sections.push(curSec);
     let startDone=false;
-    let html=`<div class="ch-block" data-c="${c}"><div class="ch-label">${BMAP[bookId].ko} ${c}</div>`;
+    let html=`<div class="ch-block" data-c="${c}"><div class="ch-label">${BMAP[bookId].ko} ${c}${bookId==='psalms'?'편':'장'}</div>`;
     sections.forEach(sec=>{
       // 소제목과 함께 시작하면 소제목 바로 위에 시작선
       if(m&&m.c1===c&&sec.h&&sec.verses[0].n===m.v1){html+=START;startDone=true;}
@@ -1097,6 +1104,7 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
       if(token!==state.token)return;
       if(!verses.length){textDiv.innerHTML=`<div class="err-msg">${chapter}장 데이터가 없습니다.</div>`;return;}
       textDiv.innerHTML=chapterHTML(chapter,verses);
+      setChGap();
       textDiv.scrollTop=0;
       state.loaded=[chapter];
       wireVerses(textDiv);
