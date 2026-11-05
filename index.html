@@ -555,7 +555,7 @@ body.bright2 #more-menu button:active,body.bright2 #more-menu button:hover{backg
 .hdr-row2 #add-panel-btn{margin-left:auto}
 
 /* ── 장 이어 보기 ── */
-.panel-text{position:relative}
+.panel-text{position:relative;overflow-anchor:none} /* 앞 장 붙일 때 위치 보정은 직접 처리 */
 .ch-block+.ch-block{margin-top:var(--chgap,77px)} /* 장과 장 사이 본문 3줄 높이 */
 /* ── 매일성경 범위 표시선 ── */
 .rp-line{position:relative;height:0;border-top:2px solid #f03e3e;margin:10px 0 8px;clear:both}
@@ -1071,6 +1071,26 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
     }catch(e){return false;}
     finally{state.appending=false;}
   }
+  // ── 앞 장 붙이기(위로 올릴 때). 화면이 튀지 않도록 늘어난 높이만큼 스크롤 위치 보정 ──
+  async function prependPrev(token){
+    if(state.prepending||!state.loaded.length)return false;
+    const first=state.loaded[0];
+    if(first<=1)return false;   // 책의 첫 장이면 멈춤
+    state.prepending=true;
+    try{
+      const c=first-1;
+      const verses=await fetchVerses(state.bookId,c,state.trans);
+      if(token!==state.token||!verses.length)return false;
+      const h0=textDiv.scrollHeight,t0=textDiv.scrollTop;
+      textDiv.insertAdjacentHTML('afterbegin',chapterHTML(c,verses));
+      textDiv.scrollTop=t0+(textDiv.scrollHeight-h0);
+      state.loaded.unshift(c);
+      wireVerses(textDiv.firstElementChild);
+      loadHl(c,token);
+      return true;
+    }catch(e){return false;}
+    finally{state.prepending=false;}
+  }
   async function fillViewport(token){
     for(let i=0;i<3&&textDiv.scrollHeight<=textDiv.clientHeight+300;i++){
       if(!await appendNext(token))break;
@@ -1080,6 +1100,7 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
   // 스크롤: 끝에 가까우면 다음 장 붙이기 + 화면 위쪽 장 번호를 상단 장 버튼에 반영
   textDiv.addEventListener('scroll',()=>{
     if(textDiv.scrollTop+textDiv.clientHeight>textDiv.scrollHeight-700) appendNext(state.token);
+    if(textDiv.scrollTop<500&&state.ready) prependPrev(state.token);
     const y=textDiv.scrollTop+60;let cur=null;
     textDiv.querySelectorAll('.ch-block').forEach(b=>{if(b.offsetTop<=y)cur=+b.dataset.c;});
     if(cur&&cur!==state.chapter){
@@ -1094,6 +1115,7 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
     if(copyMode) exitCopyMode();
     state.hl.clear();
     state.loaded=[];
+    state.ready=false;
     const token=++state.token;
     const oldCopyBtn=bar.querySelector('.copy-btn');
     if(oldCopyBtn) oldCopyBtn.remove();
@@ -1130,6 +1152,8 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
       state.targetNoHl=false;
       state.targetVerse=null;
       fillViewport(token);
+      // 처음 위치를 잡은 뒤 앞 장도 붙여 위로 드래그 가능하게
+      setTimeout(()=>{if(token===state.token){state.ready=true;if(textDiv.scrollTop<500)prependPrev(token);}},700);
     }catch(e){
       if(token===state.token) textDiv.innerHTML=`<div class="err-msg">${e.message}</div>`;
     }
@@ -1639,7 +1663,7 @@ if('serviceWorker' in navigator){
       <h4>각 창 상단</h4>
       <table>
         <tr><th>역본 · 책</th><td>창마다 역본과 책을 따로 고릅니다.</td></tr>
-        <tr><th>‹ 장 ›</th><td>앞뒤 장으로 이동합니다. 가운데 숫자를 누르면 장 목록이 열립니다. 본문을 끝까지 내리면 다음 장이 이어서 나오고, 장 번호도 따라 바뀝니다.</td></tr>
+        <tr><th>‹ 장 ›</th><td>앞뒤 장으로 이동합니다. 가운데 숫자를 누르면 장 목록이 열립니다. 본문을 위아래로 넘기면 앞뒤 장이 이어서 나오고(책의 처음·끝에서 멈춤), 장 번호도 따라 바뀝니다.</td></tr>
         <tr><th>✕</th><td>그 창을 닫습니다(창이 둘 이상일 때).</td></tr>
       </table>
       <h4>본문에서</h4>
