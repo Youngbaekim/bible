@@ -576,6 +576,53 @@ body.bright2 .sr-jump{background:#ede4d0}
 .ch-label{font-size:13px;font-weight:700;letter-spacing:1px;color:#4f46e5;font-family:'Noto Sans KR',sans-serif;padding-bottom:5px;margin-bottom:14px;border-bottom:1px solid rgba(79,70,229,.25)}
 body.dark .ch-label,body.dark2 .ch-label{color:#8fb0e6;letter-spacing:1px;border-color:rgba(143,176,230,.25)}
 body.bright2 .ch-label{color:#8a6030;letter-spacing:1px;border-color:rgba(138,96,48,.3)}
+
+/* ── 원어 분석 창 ── */
+#orig-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:flex-start;justify-content:center;padding:40px 0 16px}
+#orig-modal.open{display:flex}
+#orig-box{background:#fff;border-radius:12px;width:min(760px,96vw);max-height:calc(100vh - 56px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+#orig-box .help-head{gap:8px}
+#orig-title{font-size:14px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orig-nav{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.orig-nav button{border:1px solid #d1d5db;background:transparent;border-radius:6px;font-size:16px;line-height:1;padding:4px 10px;cursor:pointer;color:inherit}
+.orig-nav .sync-x{border:none}
+#orig-body{overflow:auto;padding:12px 16px 16px}
+.orig-text{font-size:24px;line-height:1.9;padding:6px 2px 12px;font-family:'SBL Hebrew','Ezra SIL','Noto Serif Hebrew','Times New Roman',serif}
+.ot-w{cursor:pointer;border-radius:4px;padding:0 2px}
+.ot-w:hover{background:rgba(79,70,229,.12)}
+.orig-sec{border-top:1px solid #e5e7eb;padding:8px 0}
+.orig-row{display:flex;gap:10px;padding:5px 0;font-size:14px;line-height:1.6}
+.orig-row[hidden]{display:none}
+.orig-lb{flex:0 0 76px;font-size:12px;font-weight:700;color:#6b7280;padding-top:2px}
+.ai-wait{color:#9ca3af;font-style:italic}
+.ai-err{color:#b45309;font-size:13px}
+.orig-words{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;border-top:1px solid #e5e7eb;padding-top:10px}
+.ow{border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;transition:background .3s}
+.ow.flash{background:#fff3a3}
+.ow-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ow-n{font-size:11px;color:#9ca3af}
+.ow-w{font-size:20px;font-family:'SBL Hebrew','Ezra SIL','Noto Serif Hebrew','Times New Roman',serif}
+.ow-t{font-size:12px;color:#6b7280;font-style:italic}
+.ow-g{color:#4f46e5;font-size:12px;margin:3px 0}
+.ow-m{display:flex;flex-direction:column}
+.ow-ko{font-weight:700}
+.ow-en{color:#6b7280}
+.ow-l{font-size:11px;color:#9ca3af;margin-top:3px}
+.ow-l b{font-size:14px;color:#374151;font-weight:600}
+.orig-foot{font-size:11px;color:#9ca3af;text-align:center;margin-top:12px}
+body.dark #orig-box,body.dark2 #orig-box{background:#1b1e22;border:1px solid #3a4048;color:#e8ebee}
+body.dark .orig-sec,body.dark2 .orig-sec,body.dark .orig-words,body.dark2 .orig-words{border-color:#2c3137}
+body.dark .ow,body.dark2 .ow{border-color:#2c3137;background:#23272c}
+body.dark .ow.flash,body.dark2 .ow.flash{background:#3a3520}
+body.dark .ow-g,body.dark2 .ow-g{color:#8fb0e6}
+body.dark .ow-l b,body.dark2 .ow-l b{color:#d5dade}
+body.dark .orig-nav button,body.dark2 .orig-nav button{border-color:#3a4048}
+body.dark .ot-w:hover,body.dark2 .ot-w:hover{background:#24304a}
+body.bright2 #orig-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
+body.bright2 .orig-sec,body.bright2 .orig-words{border-color:#d4c4a0}
+body.bright2 .ow{border-color:#e0d2b4;background:#fbf7ef}
+body.bright2 .ow-g{color:#8a6030}
+@media(max-width:600px){.orig-text{font-size:21px}.orig-lb{flex-basis:64px}#orig-body{padding:10px 12px 14px}}
 /* ── 새 버전 알림 ── */
 .update-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;border-radius:12px;background:#16202b;color:#fff;font-size:14px;font-family:'Pretendard Variable',Pretendard,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
 .update-toast[hidden]{display:none}
@@ -1027,6 +1074,7 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
           updateCpBar();
           return;
         }
+        if(ORIG_TRANS.includes(state.trans)){openOrig(state.bookId,+span.dataset.c,+span.dataset.v,state.trans);return;} // 원어: 분석 창
         state.hl.has(key)?state.hl.delete(key):state.hl.add(key);
         span.classList.toggle('hl');
         updateCopyBtn();
@@ -1229,6 +1277,157 @@ function transFits(t,bookId){
   if(t.scope==='nt')return NT.some(([b])=>b===bookId);
   return true;
 }
+
+// ═════════ 원어 분석(히브리어·헬라어 절 누르기) ═════════
+// 데이터: STEPBible TAHOT·TAGNT(CC BY 4.0) → orig/{책}.json, AI 직역: Supabase Edge Function 'bible-ai'
+const ORIG_TRANS=['WLC','SBLGNT'];
+const origData={};const aiMem={};
+async function loadOrig(bookId){
+  if(origData[bookId])return origData[bookId];
+  const r=await fetch(`orig/${bookId}.json`);
+  if(!r.ok)throw new Error('원어 분석 데이터를 불러오지 못했습니다.');
+  const d=await r.json();
+  d.keys=Object.keys(d.v).sort((a,b)=>{const[x1,y1]=a.split(':').map(Number),[x2,y2]=b.split(':').map(Number);return x1-x2||y1-y2;});
+  return origData[bookId]=d;
+}
+// ── 헬라어 문법 코드(Robinson) → 한국어 ──
+const G_POS={N:'명사',A:'형용사',T:'관사',V:'동사',P:'인칭대명사',R:'관계대명사',C:'상호대명사',D:'지시대명사',K:'상관대명사',I:'의문대명사',X:'부정대명사',Q:'상관·의문대명사',F:'재귀대명사',S:'소유대명사',ADV:'부사',CONJ:'접속사',COND:'조건 접속사',PRT:'불변화사',PREP:'전치사',INJ:'감탄사',ARAM:'아람어',HEB:'히브리어'};
+const G_CASE={N:'주격',G:'속격',D:'여격',A:'대격',V:'호격'},G_NUM={S:'단수',P:'복수'},G_GEN={M:'남성',F:'여성',N:'중성'};
+const G_TENSE={P:'현재',I:'미완료',F:'미래',A:'부정과거',R:'완료',L:'과거완료'};
+const G_VOICE={A:'능동태',M:'중간태',P:'수동태',E:'중간/수동태',D:'중간태(이태동사)',O:'수동태(이태동사)',N:'중간/수동태(이태동사)'};
+const G_MOOD={I:'직설법',S:'가정법',O:'희구법',M:'명령법',N:'부정사',P:'분사'};
+const G_SUF={C:'비교급',S:'최상급',N:'부정',I:'의문',K:'결합형(크라시스)',ATT:'앗티카형',ABB:'약어'};
+function grcMorph(code){
+  if(!code)return '';
+  const p=code.split('-');const out=[G_POS[p[0]]||p[0]];
+  const a=p[1]||'';let m;
+  if(p[0]==='V'){
+    if((m=a.match(/^(2?)([PIFARL])([AMPEDON])([ISOMNP])$/))){
+      out.push((m[1]?'제2':'')+G_TENSE[m[2]],G_VOICE[m[3]],G_MOOD[m[4]]);
+      const b=p[2]||'';let k;
+      if((k=b.match(/^([NGDAV])([SP])([MFN])$/)))out.push(G_CASE[k[1]],G_NUM[k[2]],G_GEN[k[3]]);
+      else if((k=b.match(/^([123])([SP])$/)))out.push(k[1]+'인칭',G_NUM[k[2]]);
+    }else if(a)out.push(a);
+  }else if(a){
+    if(a==='PRI')out.push('고유명사(불변)');else if(a==='NUI')out.push('수사(불변)');else if(a==='LI')out.push('글자(불변)');else if(a==='OI')out.push('불변');
+    else if((m=a.match(/^([123])([SP])([NGDAV])([SP])([MFN])?$/)))out.push(m[1]+'인칭 '+G_NUM[m[2]]+' 소유자',G_CASE[m[3]],G_NUM[m[4]],m[5]?G_GEN[m[5]]:'');
+    else if((m=a.match(/^([123])?([NGDAV])([SP])([MFN])?$/)))out.push(m[1]?m[1]+'인칭':'',G_CASE[m[2]],G_NUM[m[3]],m[4]?G_GEN[m[4]]:'');
+    else if(G_SUF[a])out.push(G_SUF[a]);else out.push(a);
+  }
+  p.slice(2).forEach(x=>{if(p[0]!=='V'&&G_SUF[x])out.push(G_SUF[x]);});
+  return out.filter(Boolean).join(' · ');
+}
+// ── 히브리어 문법 코드(OSHB) → 한국어 ──
+const H_STEM={q:'칼',N:'니팔',p:'피엘',P:'푸알',h:'히필',H:'호팔',t:'히트파엘',o:'포엘',O:'포알',r:'히트포엘',m:'포엘',M:'포알',k:'팔렐',K:'풀랄',Q:'칼 수동',l:'필펠',L:'폴팔',f:'히트팔펠',D:'니트파엘',j:'페알랄',i:'필렐',u:'호트파알',c:'티필',v:'히쉬타펠',w:'니트팔렐',y:'니트포엘',z:'히트포엘'};
+const A_STEM={q:'페알',Q:'페일',u:'히트페엘',N:'니팔',p:'파엘',P:'이트파알',M:'히트파알',a:'아펠',h:'하펠',s:'사펠',e:'샤펠',H:'호팔',i:'이트페엘',t:'히쉬타펠',v:'이쉬타펠',w:'히트아펠',o:'포엘',z:'이트포엘',r:'히트포엘',f:'히트팔펠',b:'헤팔',c:'티펠',m:'포엘',l:'팔펠',L:'이트팔펠',O:'이트폴렐',G:'이타팔'};
+const H_VT={p:'완료',q:'연속 완료(와우+완료)',i:'미완료',w:'연속 미완료(와익톨)',h:'청유형',j:'지시형',v:'명령형',r:'능동 분사',s:'수동 분사',a:'독립 부정사',c:'연계 부정사'};
+const H_GEN={m:'남성',f:'여성',b:'양성',c:'공성'},H_NUM={s:'단수',p:'복수',d:'쌍수'},H_ST={a:'절대형',c:'연계형',d:'한정형'};
+const H_PT={a:'긍정 불변화사',d:'정관사',e:'권유 불변화사',i:'의문 불변화사',j:'감탄사',m:'지시 불변화사',n:'부정어',o:'목적격 표지',r:'관계사',c:'접속 불변화사'};
+const H_PR={d:'지시',f:'부정',i:'의문',p:'인칭',r:'관계'};
+const H_SF={d:'방향의 헤',h:'첨가 헤',n:'첨가 눈',p:'대명 접미사'};
+function pgn(s,i){return [s[i]&&/[123]/.test(s[i])?s[i]+'인칭':'',H_GEN[s[i+1]]||'',H_NUM[s[i+2]]||''].filter(Boolean).join(' ');}
+function hebSeg(s,aram){
+  const t=s[0];
+  if(t==='V'){
+    const stem=(aram?A_STEM:H_STEM)[s[1]]||s[1],vt=s[2];const r=['동사',stem,H_VT[vt]||vt];
+    if(vt==='r'||vt==='s')r.push([H_GEN[s[3]],H_NUM[s[4]],H_ST[s[5]]].filter(Boolean).join(' '));
+    else if(vt!=='a'&&vt!=='c')r.push(pgn(s,3));
+    return r.filter(Boolean).join(' · ');
+  }
+  if(t==='N'){const ty={c:'보통명사',g:'민족명',p:'고유명사'}[s[1]]||'명사';return [ty,[H_GEN[s[2]],H_NUM[s[3]],H_ST[s[4]]].filter(Boolean).join(' ')].filter(Boolean).join(' · ');}
+  if(t==='A'){const ty={a:'형용사',c:'기수',g:'민족 형용사',o:'서수'}[s[1]]||'형용사';return [ty,[H_GEN[s[2]],H_NUM[s[3]],H_ST[s[4]]].filter(Boolean).join(' ')].filter(Boolean).join(' · ');}
+  if(t==='P')return [(H_PR[s[1]]||'')+'대명사',pgn(s,2)].filter(Boolean).join(' · ');
+  if(t==='S')return [H_SF[s[1]]||'접미사',s[1]==='p'?pgn(s,2):''].filter(Boolean).join(' · ');
+  if(t==='T')return H_PT[s[1]]||'불변화사';
+  if(t==='R')return s[1]==='d'?'전치사+정관사':'전치사';
+  if(t==='C')return '접속사';
+  if(t==='D')return '부사';
+  return s;
+}
+function hebMorph(code){
+  if(!code)return '';
+  const aram=code[0]==='A';
+  return (aram?'[아람어] ':'')+code.slice(1).split('/').map(x=>hebSeg(x,aram)).join(' + ');
+}
+// ── 분석 창 ──
+let origCur=null;
+function escH(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+async function openOrig(bookId,c,v,trans){
+  document.getElementById('orig-modal').classList.add('open');
+  const body=document.getElementById('orig-body');
+  body.innerHTML='<div class="loading"><div class="spinner">✦</div><br>원어 분석 불러오는 중...</div>';
+  try{
+    const d=await loadOrig(bookId);
+    origCur={bookId,trans,d,key:`${c}:${v}`};
+    renderOrig();
+  }catch(e){body.innerHTML=`<div class="err-msg">${escH(e.message)}</div>`;}
+}
+function closeOrig(){document.getElementById('orig-modal').classList.remove('open');origCur=null;}
+function origStep(dir){
+  if(!origCur)return;const ks=origCur.d.keys;const i=ks.indexOf(origCur.key)+dir;
+  if(i<0||i>=ks.length)return;origCur.key=ks[i];renderOrig();
+}
+async function renderOrig(){
+  const {bookId,d,key}=origCur;const words=d.v[key];
+  const heb=d.lang==='heb';const bk=BMAP[bookId].ko;
+  const eng=(d.e&&d.e[key])||key;
+  const [ec,ev]=eng.split(':').map(Number);
+  const refKo=`${bk} ${eng}${eng!==key?` (히브리어 본문 ${key})`:''}${ev===0?' 표제':''}`;
+  document.getElementById('orig-title').textContent=`${heb?'히브리어':'헬라어'} 분석 · ${refKo}`;
+  const body=document.getElementById('orig-body');
+  if(!words){body.innerHTML='<div class="err-msg">이 절의 분석 자료가 없습니다.</div>';return;}
+  const disp=w=>w.replace(/\//g,'');
+  const aiKey=`${d.lang}:${bookId}:${key}`;
+  body.innerHTML=`
+    <div class="orig-text" dir="${heb?'rtl':'ltr'}">${words.map((w,i)=>`<span class="ot-w" data-i="${i}">${escH(disp(w[0]))}</span>`).join(' ')}</div>
+    <div class="orig-sec">
+      <div class="orig-row"><span class="orig-lb">단어순 직역</span><span>${escH(words.map(w=>w[2].replace(/\//g,' ')).join(' '))}</span></div>
+      <div class="orig-row"><span class="orig-lb">한글 직역</span><span id="ai-ko" class="ai-wait">AI 직역 생성 중…</span></div>
+      <div class="orig-row" id="ai-en-row"><span class="orig-lb">영어 직역</span><span id="ai-en" class="ai-wait">…</span></div>
+      <div class="orig-row" id="ai-note-row" hidden><span class="orig-lb">문법 메모</span><span id="ai-note"></span></div>
+    </div>
+    <div class="orig-sec" id="orig-ref"></div>
+    <div class="orig-words">${words.map((w,i)=>`
+      <div class="ow" id="ow-${i}">
+        <div class="ow-top"><span class="ow-n">${i+1}</span><span class="ow-w" dir="${heb?'rtl':'ltr'}">${escH(disp(w[0]))}</span><span class="ow-t">${escH(w[1])}</span></div>
+        <div class="ow-g">${escH(heb?hebMorph(w[4]):grcMorph(w[4]))}</div>
+        <div class="ow-m"><span class="ow-ko" id="owk-${i}"></span><span class="ow-en">${escH(w[2])}</span></div>
+        <div class="ow-l">원형 <b dir="${heb?'rtl':'ltr'}">${escH(w[5])}</b> ${escH(w[6])} · ${escH(w[3])}</div>
+      </div>`).join('')}</div>
+    <div class="orig-foot">원어 분석: STEPBible Data (Tyndale House, CC BY 4.0) · 직역·단어 뜻(한): AI 생성, 참고용</div>`;
+  body.scrollTop=0;
+  body.querySelectorAll('.ot-w').forEach(s=>s.onclick=()=>{const el=document.getElementById('ow-'+s.dataset.i);el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1200);});
+  // 참고 번역(같은 절, 한글·영어 성경 절 번호)
+  if(ev>0)Promise.all(['kor','esv'].map(t=>fetchVerses(bookId,ec,t).then(vs=>(vs.find(x=>x.n===ev)||{}).t||'').catch(()=>''))).then(([k,e])=>{
+    if(!origCur||origCur.key!==key)return;
+    const el=document.getElementById('orig-ref');if(!el)return;
+    el.innerHTML=(k?`<div class="orig-row"><span class="orig-lb">개역개정</span><span>${k}</span></div>`:'')+(e?`<div class="orig-row"><span class="orig-lb">ESV</span><span>${e}</span></div>`:'');
+  });
+  // AI 직역(누르는 즉시 자동 요청, 결과는 저장되어 다음부터 즉시)
+  const fill=r=>{
+    if(!origCur||`${origCur.d.lang}:${origCur.bookId}:${origCur.key}`!==aiKey)return;
+    const ko=document.getElementById('ai-ko'),en=document.getElementById('ai-en');
+    if(r.error){ko.textContent=r.error;ko.className='ai-err';document.getElementById('ai-en-row').hidden=true;return;}
+    ko.textContent=r.ko||'';en.textContent=r.en||'';ko.className=en.className='';
+    if(r.note){document.getElementById('ai-note').textContent=r.note;document.getElementById('ai-note-row').hidden=false;}
+    (r.words||[]).forEach((t,i)=>{const s=document.getElementById('owk-'+i);if(s)s.textContent=t;});
+  };
+  if(aiMem[aiKey]){fill(aiMem[aiKey]);return;}
+  if(!authToken||!authAllowed){fill({error:'로그인하면 AI 직역(한·영)과 단어별 한글 뜻이 자동으로 표시됩니다.'});return;}
+  try{
+    const res=await fetch(SB_URL+'/functions/v1/bible-ai',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+authToken,'Content-Type':'application/json'},
+      body:JSON.stringify({key:aiKey,lang:d.lang,ref:refKo,words})});
+    const r=await res.json();
+    if(!res.ok)throw new Error(r.error||('오류 '+res.status));
+    aiMem[aiKey]=r;fill(r);
+  }catch(e){fill({error:'AI 직역을 가져오지 못했습니다: '+e.message});}
+}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='orig-modal')closeOrig();});
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('orig-modal').classList.contains('open'))return;
+  if(e.key==='Escape')closeOrig();else if(e.key==='ArrowLeft')origStep(-1);else if(e.key==='ArrowRight')origStep(1);
+});
+
 function syncPanels(){ openSync(); }
 
 // ── 스마트폰: ⋮ 메뉴(검색 / 안내 / 줄바꿈 / 로그인·로그아웃) ──
@@ -1633,6 +1832,14 @@ if('serviceWorker' in navigator){
 
 <div id="more-menu" hidden></div>
 
+<div id="orig-modal">
+  <div id="orig-box">
+    <div class="help-head"><span id="orig-title">원어 분석</span>
+      <span class="orig-nav"><button type="button" onclick="origStep(-1)" title="이전 절">‹</button><button type="button" onclick="origStep(1)" title="다음 절">›</button><button type="button" class="sync-x" onclick="closeOrig()">✕</button></span></div>
+    <div id="orig-body"></div>
+  </div>
+</div>
+
 <div id="plan-modal">
   <div id="plan-box">
     <div class="help-head"><span>매일성경 읽기표</span><button type="button" class="sync-x" onclick="closePlan()">✕</button></div>
@@ -1669,6 +1876,7 @@ if('serviceWorker' in navigator){
       <h4>본문에서</h4>
       <table>
         <tr><th>절 누르기</th><td>형광펜을 칠하거나 지웁니다. 칠한 절이 있으면 창 상단에 ‘복사’ 버튼이 생깁니다.</td></tr>
+        <tr><th>원어 분석</th><td>히브리어·헬라어 창에서 절을 누르면 분석 창이 열립니다: 원문, 단어순 직역, AI 직역(한·영, 로그인 필요, 처음 한 번 생성 후 저장), 개역개정·ESV 참고, 단어별 음역·원형·스트롱·문법 분석·뜻. 원문 단어를 누르면 해당 단어 설명으로 이동하고, ‹ ›로 앞뒤 절을 봅니다.</td></tr>
         <tr><th>절 길게 누르기</th><td>복사 모드가 켜집니다. 고른 절은 절 번호가 붉은 원으로 표시되며, 여러 절을 눌러 고른 뒤 ‘복사’를 누릅니다.</td></tr>
       </table>
       <h4>그 밖에</h4>
@@ -1774,6 +1982,7 @@ document.getElementById('panels').addEventListener('click',function(e){
   const pData=panels.find(p=>p.el===panelEl);
   if(!pData)return;
   const st=pData.getState();
+  if(ORIG_TRANS.includes(st.trans))return; // 원어 창은 형광펜 대신 분석 창
   const v=+row.dataset.v;
   const c=row.dataset.c?+row.dataset.c:st.chapter;
   setTimeout(function(){
