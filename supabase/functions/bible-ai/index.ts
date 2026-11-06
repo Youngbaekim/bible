@@ -14,7 +14,11 @@ const json = (b: unknown, s = 200) =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    // 서버 전용 키: 예전 이름(SERVICE_ROLE) 또는 새 이름(SECRET) 중 있는 것 사용
+    const svc = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY") || "";
+    if (!svc) return json({ error: "server key missing (SUPABASE_SERVICE_ROLE_KEY)" }, 500);
+    if (!Deno.env.get("ANTHROPIC_API_KEY")) return json({ error: "ANTHROPIC_API_KEY secret missing" }, 500);
+    const sb = createClient(Deno.env.get("SUPABASE_URL")!, svc);
     // 1) 로그인 + 허용 사용자 확인(비용 보호)
     const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: u } = await sb.auth.getUser(token);

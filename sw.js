@@ -2,7 +2,7 @@
 // VERSION is bumped automatically by deploy.ps1 on every deploy.
 // 같은 주소(youngbaekim.github.io)의 다른 앱(devotion, utmost 등)과 저장공간을 함께 쓰므로
 // 이름이 'bible-'로 시작하는 저장공간만 만들고 지운다.
-const VERSION = '20261107-034545';
+const VERSION = '20261107-035649';
 const SHELL = 'bible-shell-' + VERSION;   // pages, icons: replaced every deploy
 const DATA  = 'bible-data-v1';            // bible / commentary JSON: kept across deploys
 const FONTS = 'bible-fonts-v1';           // web fonts: kept across deploys
