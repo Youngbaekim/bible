@@ -1281,6 +1281,8 @@ function transFits(t,bookId){
 // ═════════ 원어 분석(히브리어·헬라어 절 누르기) ═════════
 // 데이터: STEPBible TAHOT·TAGNT(CC BY 4.0) → orig/{책}.json, AI 직역: Supabase Edge Function 'bible-ai'
 const ORIG_TRANS=['WLC','SBLGNT'];
+const AI_ENABLED=false; // AI 직역(API 키 필요) 사용 여부 — 끄면 요청도 화면도 없음
+const ORIG_REFS=[['kor','개역개정'],['saebeon','새번역'],['esv','ESV'],['NKJV','NKJV']]; // 분석 창 참고 역본
 const origData={};const aiMem={};
 async function loadOrig(bookId){
   if(origData[bookId])return origData[bookId];
@@ -1382,9 +1384,9 @@ async function renderOrig(){
     <div class="orig-text" dir="${heb?'rtl':'ltr'}">${words.map((w,i)=>`<span class="ot-w" data-i="${i}">${escH(disp(w[0]))}</span>`).join(' ')}</div>
     <div class="orig-sec">
       <div class="orig-row"><span class="orig-lb">단어순 직역</span><span>${escH(words.map(w=>w[2].replace(/\//g,' ')).join(' '))}</span></div>
-      <div class="orig-row"><span class="orig-lb">한글 직역</span><span id="ai-ko" class="ai-wait">AI 직역 생성 중…</span></div>
+      ${AI_ENABLED?`<div class="orig-row"><span class="orig-lb">한글 직역</span><span id="ai-ko" class="ai-wait">AI 직역 생성 중…</span></div>
       <div class="orig-row" id="ai-en-row"><span class="orig-lb">영어 직역</span><span id="ai-en" class="ai-wait">…</span></div>
-      <div class="orig-row" id="ai-note-row" hidden><span class="orig-lb">문법 메모</span><span id="ai-note"></span></div>
+      <div class="orig-row" id="ai-note-row" hidden><span class="orig-lb">문법 메모</span><span id="ai-note"></span></div>`:''}
     </div>
     <div class="orig-sec" id="orig-ref"></div>
     <div class="orig-words">${words.map((w,i)=>`
@@ -1394,14 +1396,14 @@ async function renderOrig(){
         <div class="ow-m"><span class="ow-ko" id="owk-${i}"></span><span class="ow-en">${escH(w[2])}</span></div>
         <div class="ow-l">원형 <b dir="${heb?'rtl':'ltr'}">${escH(w[5])}</b> ${escH(w[6])} · ${escH(w[3])}</div>
       </div>`).join('')}</div>
-    <div class="orig-foot">원어 분석: STEPBible Data (Tyndale House, CC BY 4.0) · 직역·단어 뜻(한): AI 생성, 참고용</div>`;
+    <div class="orig-foot">원어 분석: STEPBible Data (Tyndale House, CC BY 4.0)${AI_ENABLED?' · 직역·단어 뜻(한): AI 생성, 참고용':''}</div>`;
   body.scrollTop=0;
   body.querySelectorAll('.ot-w').forEach(s=>s.onclick=()=>{const el=document.getElementById('ow-'+s.dataset.i);el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1200);});
   // 참고 번역(같은 절, 한글·영어 성경 절 번호)
-  if(ev>0)Promise.all(['kor','esv'].map(t=>fetchVerses(bookId,ec,t).then(vs=>(vs.find(x=>x.n===ev)||{}).t||'').catch(()=>''))).then(([k,e])=>{
+  if(ev>0)Promise.all(ORIG_REFS.map(([t])=>fetchVerses(bookId,ec,t).then(vs=>(vs.find(x=>+x.n===ev)||{}).t||'').catch(()=>''))).then(texts=>{
     if(!origCur||origCur.key!==key)return;
     const el=document.getElementById('orig-ref');if(!el)return;
-    el.innerHTML=(k?`<div class="orig-row"><span class="orig-lb">개역개정</span><span>${k}</span></div>`:'')+(e?`<div class="orig-row"><span class="orig-lb">ESV</span><span>${e}</span></div>`:'');
+    el.innerHTML=ORIG_REFS.map(([,lb],i)=>texts[i]?`<div class="orig-row"><span class="orig-lb">${lb}</span><span>${texts[i]}</span></div>`:'').join('');
   });
   // AI 직역(누르는 즉시 자동 요청, 결과는 저장되어 다음부터 즉시)
   const fill=r=>{
@@ -1412,6 +1414,7 @@ async function renderOrig(){
     if(r.note){document.getElementById('ai-note').textContent=r.note;document.getElementById('ai-note-row').hidden=false;}
     (r.words||[]).forEach((t,i)=>{const s=document.getElementById('owk-'+i);if(s)s.textContent=t;});
   };
+  if(!AI_ENABLED)return;
   if(aiMem[aiKey]){fill(aiMem[aiKey]);return;}
   if(!authToken||!authAllowed){fill({error:'로그인하면 AI 직역(한·영)과 단어별 한글 뜻이 자동으로 표시됩니다.'});return;}
   try{
@@ -1876,7 +1879,7 @@ if('serviceWorker' in navigator){
       <h4>본문에서</h4>
       <table>
         <tr><th>절 누르기</th><td>형광펜을 칠하거나 지웁니다. 칠한 절이 있으면 창 상단에 ‘복사’ 버튼이 생깁니다.</td></tr>
-        <tr><th>원어 분석</th><td>히브리어·헬라어 창에서 절을 누르면 분석 창이 열립니다: 원문, 단어순 직역, AI 직역(한·영, 로그인 필요, 처음 한 번 생성 후 저장), 개역개정·ESV 참고, 단어별 음역·원형·스트롱·문법 분석·뜻. 원문 단어를 누르면 해당 단어 설명으로 이동하고, ‹ ›로 앞뒤 절을 봅니다.</td></tr>
+        <tr><th>원어 분석</th><td>히브리어·헬라어 창에서 절을 누르면 분석 창이 열립니다: 원문, 단어순 직역, 개역개정·새번역·ESV·NKJV 참고, 단어별 음역·원형·스트롱·문법 분석·뜻. 원문 단어를 누르면 해당 단어 설명으로 이동하고, ‹ ›로 앞뒤 절을 봅니다.</td></tr>
         <tr><th>절 길게 누르기</th><td>복사 모드가 켜집니다. 고른 절은 절 번호가 붉은 원으로 표시되며, 여러 절을 눌러 고른 뒤 ‘복사’를 누릅니다.</td></tr>
       </table>
       <h4>그 밖에</h4>

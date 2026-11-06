@@ -11,6 +11,34 @@ const CORS = {
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
 
+// 모델: ANTHROPIC_MODEL 비밀값이 있으면 그것, 없으면 계정에서 쓸 수 있는 최신 Sonnet을 자동 선택
+let MODEL_CACHE = "";
+async function pickModel(key: string): Promise<string> {
+  const fixed = Deno.env.get("ANTHROPIC_MODEL");
+  if (fixed) return fixed;
+  if (MODEL_CACHE) return MODEL_CACHE;
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/models?limit=100", {
+      headers: { "x-api-key": key, "anthropic-version": "2023-06-01" },
+    });
+    if (r.ok) {
+      const ids: string[] = ((await r.json()).data || []).map((m: { id: string }) => m.id);
+      MODEL_CACHE = ids.find((id) => id.includes("sonnet")) || ids[0] || "";
+    }
+  } catch (_) { /* 아래 기본값 사용 */ }
+  return MODEL_CACHE || "claude-sonnet-4-5";
+}
+// Anthropic 오류를 사람이 읽을 수 있게
+function aiErr(status: number, body: string): string {
+  let msg = body;
+  try { msg = JSON.parse(body)?.error?.message || body; } catch (_) { /* 원문 */ }
+  if (status === 401) return "API 키가 올바르지 않습니다(ANTHROPIC_API_KEY 확인): " + msg;
+  if (status === 404) return "모델을 찾을 수 없습니다(ANTHROPIC_MODEL 확인): " + msg;
+  if (status === 429) return "요청 한도 초과(잠시 후 다시): " + msg;
+  if (/credit|balance|billing/i.test(msg)) return "Anthropic 계정 크레딧(결제) 확인 필요: " + msg;
+  return `AI 오류 ${status}: ${msg}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
@@ -51,7 +79,7 @@ ${table}
   "words": ["1번 단어의 한국어 뜻(이 문맥에서, 짧게)", "2번 ...", ...],   // 표의 단어 수와 정확히 같은 개수, 같은 순서
   "note": "직역에서 주의할 문법·어순 포인트 1~3문장(한국어)"
 }`;
-    const model = Deno.env.get("ANTHROPIC_MODEL") || "claude-sonnet-4-5";
+    const model = await pickModel(Deno.env.get("ANTHROPIC_API_KEY")!);
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -61,7 +89,7 @@ ${table}
       },
       body: JSON.stringify({ model, max_tokens: 2000, messages: [{ role: "user", content: prompt }] }),
     });
-    if (!r.ok) return json({ error: "ai error", detail: await r.text() }, 502);
+    if (!r.ok) return json({ error: aiErr(r.status, await r.text()), model }, 502);
     const out = await r.json();
     const text = (out.content || []).map((c: { text?: string }) => c.text || "").join("");
     const m = text.match(/\{[\s\S]*\}/);
