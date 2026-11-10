@@ -586,6 +586,7 @@ body.bright2 .ch-label{color:#8a6030;letter-spacing:1px;border-color:rgba(138,96
 .orig-nav{display:flex;align-items:center;gap:2px;flex-shrink:0}
 .orig-nav button{border:1px solid #d1d5db;background:transparent;border-radius:6px;font-size:16px;line-height:1;padding:4px 10px;cursor:pointer;color:inherit}
 .orig-nav .sync-x{border:none}
+.orig-nav .orig-share{font-size:12px;font-weight:700;padding:6px 10px;margin-right:4px;font-family:'Noto Sans KR',sans-serif}
 #orig-body{overflow:auto;padding:12px 16px 16px}
 .orig-text{font-size:24px;line-height:1.9;padding:6px 2px 12px;font-family:'SBL Hebrew','Ezra SIL','Noto Serif Hebrew','Times New Roman',serif}
 .ot-w{cursor:pointer;border-radius:4px;padding:0 2px}
@@ -623,6 +624,70 @@ body.bright2 .orig-sec,body.bright2 .orig-words{border-color:#d4c4a0}
 body.bright2 .ow{border-color:#e0d2b4;background:#fbf7ef}
 body.bright2 .ow-g{color:#8a6030}
 @media(max-width:600px){.orig-text{font-size:21px}.orig-lb{flex-basis:64px}#orig-body{padding:10px 12px 14px}}
+
+/* ── 절 메뉴(길게 누르기·우클릭) ── */
+#verse-menu{position:fixed;z-index:3000;min-width:200px;background:#fff;border:1px solid #d1d5db;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:4px;display:flex;flex-direction:column}
+#verse-menu[hidden]{display:none}
+#verse-menu button{border:none;background:transparent;text-align:left;padding:11px 14px;font-size:14px;border-radius:7px;cursor:pointer;color:#111827;font-family:'Noto Sans KR',sans-serif}
+#verse-menu button+button{border-top:1px solid #f0f1f3}
+#verse-menu button:hover,#verse-menu button:active{background:#eef2ff}
+body.dark #verse-menu,body.dark2 #verse-menu{background:#1b1e22;border-color:#3a4048}
+body.dark #verse-menu button,body.dark2 #verse-menu button{color:#d5dade}
+body.dark #verse-menu button+button,body.dark2 #verse-menu button+button{border-color:#2c3137}
+body.dark #verse-menu button:hover,body.dark2 #verse-menu button:hover{background:#24304a}
+body.bright2 #verse-menu{background:#f8f3ea;border-color:#c4b08a}
+body.bright2 #verse-menu button{color:#3d2b1a}
+body.bright2 #verse-menu button:hover{background:#ede4d0}
+.vi.vm-on .vt{outline:2px solid rgba(91,141,239,.55);outline-offset:2px;border-radius:3px}
+/* 휴대폰 길게 누르기 시 기본 글자 선택·메뉴가 끼어들지 않게 */
+@media (hover:none){.vi{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}}
+
+/* ── 절 메뉴 확장 ── */
+#verse-menu{min-width:240px;max-width:min(320px,94vw)}
+#verse-menu button[data-i]{padding:9px 14px}
+.vm-hl{display:flex;align-items:center;gap:8px;padding:9px 12px 8px;border-top:1px solid #f0f1f3;font-size:13px;color:#6b7280}
+.vm-hl span{flex:1}
+#verse-menu .vm-dot{width:24px;height:24px;border-radius:50%;padding:0;border:2px solid rgba(0,0,0,.12);flex-shrink:0}
+#verse-menu .vm-dot.on{border-color:#4f46e5;box-shadow:0 0 0 2px rgba(79,70,229,.25)}
+#verse-menu .vm-clear{background:transparent;font-size:12px;line-height:20px;text-align:center;color:#9ca3af}
+body.dark .vm-hl,body.dark2 .vm-hl{border-color:#2c3137;color:#9aa5b0}
+body.bright2 .vm-hl{border-color:#e6dac0}
+/* ── 형광펜 색 ── */
+.vi.hl[data-hc="green"] .vt{background:#C5E1A5 !important;color:#16202b !important}
+.vi.hl[data-hc="pink"] .vt{background:#F8BBD0 !important;color:#16202b !important}
+.vi.hl[data-hc="blue"] .vt{background:#B3E5FC !important;color:#16202b !important}
+/* ── 메모 표시 ── */
+.vnote{cursor:pointer;font-size:.8em;margin-left:4px;vertical-align:.1em;opacity:.85}
+/* ── 공용 정보 창 ── */
+#info-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2100;align-items:flex-start;justify-content:center;padding:50px 0 20px}
+#info-modal.open{display:flex}
+#info-box{background:#fff;border-radius:12px;width:min(620px,94vw);max-height:calc(100vh - 70px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+#info-body{overflow:auto;padding:12px 16px 16px;font-size:14px;line-height:1.7}
+.note-verse{font-size:13px;color:#6b7280;margin-bottom:8px}
+#note-ta{width:100%;font:14px/1.6 'Noto Sans KR',sans-serif;padding:10px;border:1px solid #d1d5db;border-radius:8px;resize:vertical;background:transparent;color:inherit;box-sizing:border-box}
+.note-act{display:flex;align-items:center;gap:8px;margin-top:8px}
+.note-hint{flex:1;font-size:11px;color:#9ca3af}
+.note-act button{border:1px solid #d1d5db;background:transparent;border-radius:6px;padding:6px 14px;cursor:pointer;color:inherit;font-family:inherit}
+#note-save{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.mh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:12px;color:#9ca3af}
+.mh-nav button{border:1px solid #d1d5db;background:transparent;border-radius:6px;padding:4px 10px;cursor:pointer;color:inherit;font-family:inherit;font-size:12px}
+.mh-nav button:disabled{opacity:.3;cursor:default}
+.mh-h{margin:8px 0;font-size:15px;color:#4f46e5}
+.ws-hint{font-size:12px;color:#9ca3af;margin-bottom:10px}
+.ws-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ws-chips button{border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:16px;padding:6px 12px;font-size:14px;cursor:pointer;font-family:inherit}
+body.dark #info-box,body.dark2 #info-box{background:#1b1e22;border:1px solid #3a4048;color:#e8ebee}
+body.dark #note-ta,body.dark2 #note-ta,body.dark .note-act button,body.dark2 .note-act button,body.dark .mh-nav button,body.dark2 .mh-nav button{border-color:#3a4048}
+body.dark #note-save,body.dark2 #note-save{background:#8fb0e6;border-color:#8fb0e6;color:#10151c}
+body.dark .mh-h,body.dark2 .mh-h{color:#8fb0e6}
+body.dark .ws-chips button,body.dark2 .ws-chips button{background:#24304a;border-color:#3d5580;color:#d5dade}
+body.bright2 #info-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
+body.bright2 #note-save{background:#8a6030;border-color:#8a6030}
+body.bright2 .mh-h{color:#8a6030}
+body.bright2 .ws-chips button{background:#ede4d0;border-color:#c4b08a;color:#3d2b1a}
+/* ── 짧은 알림 ── */
+#mini-toast{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:#16202b;color:#fff;font:13px 'Noto Sans KR',sans-serif;padding:8px 14px;border-radius:8px;opacity:0;pointer-events:none;transition:all .2s;z-index:9999}
+#mini-toast.show{opacity:1;transform:translateX(-50%)}
 /* ── 새 버전 알림 ── */
 .update-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;border-radius:12px;background:#16202b;color:#fff;font-size:14px;font-family:'Pretendard Variable',Pretendard,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
 .update-toast[hidden]{display:none}
@@ -729,17 +794,52 @@ const SB_KEY='sb_publishable_JDZtHylyUtZeDjph1aGUbQ_ru-YB_ga';
 let authUser=null, authToken=null, authAllowed=false;
 function sbH(){return{'apikey':SB_KEY,'Authorization':'Bearer '+(authToken||SB_KEY),'Content-Type':'application/json','Prefer':'return=minimal'};}
 
+// 형광펜: [{verse,color}] (color 열이 아직 없으면 verse만)
 async function sbLoad(trans,book,ch){
   if(!authUser) return [];
+  const q='&trans=eq.'+encodeURIComponent(trans)+'&book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch;
   try{
-    const r=await fetch(SB_URL+'/rest/v1/bible_highlights?select=verse&trans=eq.'+encodeURIComponent(trans)+'&book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch,{headers:sbH()});
+    let r=await fetch(SB_URL+'/rest/v1/bible_highlights?select=verse,color'+q,{headers:sbH()});
+    if(!r.ok) r=await fetch(SB_URL+'/rest/v1/bible_highlights?select=verse'+q,{headers:sbH()});
     if(!r.ok)return[];
-    return(await r.json()).map(d=>d.verse);
+    return(await r.json()).map(d=>({verse:d.verse,color:d.color||''}));
   }catch(e){return[];}
 }
-async function sbSave(trans,book,ch,v){
+async function sbSave(trans,book,ch,v,color){
   if(!authUser||!authAllowed) return;
-  try{await fetch(SB_URL+'/rest/v1/bible_highlights',{method:'POST',headers:sbH(),body:JSON.stringify({trans,book,chapter:ch,verse:v,user_id:authUser.id})});}catch(e){}
+  const row={trans,book,chapter:ch,verse:v,user_id:authUser.id};
+  try{
+    let r=await fetch(SB_URL+'/rest/v1/bible_highlights',{method:'POST',headers:sbH(),body:JSON.stringify(color?{...row,color}:row)});
+    if(!r.ok&&color) await fetch(SB_URL+'/rest/v1/bible_highlights',{method:'POST',headers:sbH(),body:JSON.stringify(row)}); // color 열 없을 때
+  }catch(e){}
+}
+// ── 절 메모: 로그인(허용 계정)이면 Supabase, 아니면 이 기기에만 저장 ──
+const NOTE_LS='bible_notes';
+function lsNotes(){try{return JSON.parse(localStorage.getItem(NOTE_LS)||'{}');}catch(e){return{};}}
+function noteKey(b,c,v){return b+':'+c+':'+v;}
+async function notesLoad(book,ch){
+  const out={};const ls=lsNotes();
+  Object.keys(ls).forEach(k=>{const[b,c,v]=k.split(':');if(b===book&&+c===ch)out[+v]=ls[k];});
+  if(authUser&&authAllowed){
+    try{
+      const r=await fetch(SB_URL+'/rest/v1/bible_notes?select=verse,note&book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch,{headers:sbH()});
+      if(r.ok)(await r.json()).forEach(d=>{if(d.note)out[d.verse]=d.note;});
+    }catch(e){}
+  }
+  return out;
+}
+async function noteSave(book,ch,v,text){
+  const ls=lsNotes();const k=noteKey(book,ch,v);
+  if(text)ls[k]=text;else delete ls[k];
+  try{localStorage.setItem(NOTE_LS,JSON.stringify(ls));}catch(e){}
+  if(authUser&&authAllowed){
+    try{
+      if(text) await fetch(SB_URL+'/rest/v1/bible_notes?on_conflict=user_id,book,chapter,verse',{method:'POST',
+        headers:{...sbH(),'Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify({user_id:authUser.id,book,chapter:ch,verse:v,note:text,updated_at:new Date().toISOString()})});
+      else await fetch(SB_URL+'/rest/v1/bible_notes?book=eq.'+encodeURIComponent(book)+'&chapter=eq.'+ch+'&verse=eq.'+v,{method:'DELETE',headers:sbH()});
+    }catch(e){}
+  }
 }
 async function sbDel(trans,book,ch,v){
   if(!authUser) return;
@@ -1054,15 +1154,47 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
   function wireVerses(root){
     root.querySelectorAll('.vi').forEach(span=>{
       const key=K(+span.dataset.c,+span.dataset.v);
+      const menu=()=>{
+        lpTriggered=true;
+        if(copyMode)return; // 복사 모드 중에는 메뉴 없이 선택만
+        const c=+span.dataset.c,v=+span.dataset.v,bk=state.bookId,ref=`${BMAP[bk].ko} ${c}:${v}`;
+        const vtext=()=>(span.querySelector('.vt')?.textContent||'').trim();
+        showVerseMenu(span,[
+          {l:`📋 복사 (${ref})`,f:()=>writeClip(buildCopyText(new Set([key])),()=>toast(`${ref} 복사됨`))},
+          {l:'☑️ 복사 모드 (여러 절 선택)',f:()=>enterCopyMode(key)},
+          {l:'📝 절 메모',f:()=>openNote(bk,c,v,span)},
+          {l:'🔗 이 절 공유',f:()=>shareVerse(bk,c,v,state.trans,vtext())},
+          {l:`🔍 원어 분석 (${ref})`,f:()=>openOrig(bk,c,v,state.trans)},
+          {l:'📚 매튜헨리 주석',f:()=>openMH(bk,c,v)},
+          {l:'🔤 단어 검색',f:()=>openWordSearch(vtext(),state.trans,ref)},
+        ],{cur:span.classList.contains('hl')?(span.dataset.hc||''):null,set:col=>{
+          const had=state.hl.has(key);
+          if(col===null){ // 지우기
+            if(had){state.hl.delete(key);span.classList.remove('hl');delete span.dataset.hc;sbDel(state.trans,bk,c,v);}
+          }else{
+            setHlColorPref(col);
+            state.hl.add(key);span.classList.add('hl');if(col)span.dataset.hc=col;else delete span.dataset.hc;
+            (had?sbDel(state.trans,bk,c,v):Promise.resolve()).then(()=>sbSave(state.trans,bk,c,v,col));
+          }
+          updateCopyBtn();
+        }});
+      };
       span.addEventListener('touchstart',()=>{
+        window._lastTouch=Date.now();
         lpTriggered=false;
-        lpTimer=setTimeout(()=>{lpTriggered=true;enterCopyMode(key);},600);
+        lpTimer=setTimeout(menu,550);
       },{passive:true});
+      span.addEventListener('contextmenu',e=>{ // PC 우클릭 · 안드로이드 길게 누르기
+        e.preventDefault();
+        if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}
+        if(document.getElementById('verse-menu').hidden)menu();
+      });
       span.addEventListener('touchend',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
       span.addEventListener('touchmove',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
-      span.addEventListener('mousedown',()=>{
+      span.addEventListener('mousedown',e=>{
+        if(e.button!==0||Date.now()-(window._lastTouch||0)<1500)return; // 터치 뒤 따라오는 마우스 이벤트 무시
         lpTriggered=false;
-        lpTimer=setTimeout(()=>{lpTriggered=true;enterCopyMode(key);},600);
+        lpTimer=setTimeout(menu,600);
       });
       span.addEventListener('mouseup',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
       span.addEventListener('mouseleave',()=>{if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}});
@@ -1075,8 +1207,8 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
           return;
         }
         if(ORIG_TRANS.includes(state.trans)){openOrig(state.bookId,+span.dataset.c,+span.dataset.v,state.trans);return;} // 원어: 분석 창
-        state.hl.has(key)?state.hl.delete(key):state.hl.add(key);
-        span.classList.toggle('hl');
+        if(state.hl.has(key)){state.hl.delete(key);span.classList.remove('hl');delete span.dataset.hc;}
+        else{state.hl.add(key);span.classList.add('hl');const hc=getHlColor();if(hc)span.dataset.hc=hc;else delete span.dataset.hc;}
         updateCopyBtn();
       };
     });
@@ -1087,12 +1219,16 @@ function createPanel(initBook='john', initChapter=3, initTrans='kor', force=fals
     const {trans,bookId}=state;
     sbLoad(trans,bookId,c).then(saved=>{
       if(token!==state.token)return;
-      saved.forEach(v=>{
+      saved.forEach(({verse:v,color})=>{
         state.hl.add(K(c,v));
         const el2=textDiv.querySelector(`.vi[data-c="${c}"][data-v="${v}"]`);
-        if(el2) el2.classList.add('hl');
+        if(el2){el2.classList.add('hl');if(color)el2.dataset.hc=color;}
       });
       if(state.hl.size>0) updateCopyBtn();
+    });
+    notesLoad(bookId,c).then(notes=>{
+      if(token!==state.token)return;
+      Object.entries(notes).forEach(([v,t])=>markNote(textDiv.querySelector(`.vi[data-c="${c}"][data-v="${v}"]`),t));
     });
   }
 
@@ -1280,6 +1416,9 @@ function transFits(t,bookId){
 
 // ═════════ 원어 분석(히브리어·헬라어 절 누르기) ═════════
 // 데이터: STEPBible TAHOT·TAGNT(CC BY 4.0) → orig/{책}.json, AI 직역: Supabase Edge Function 'bible-ai'
+const HL_COLORS=[['','노랑','#FFF176'],['green','연두','#C5E1A5'],['pink','분홍','#F8BBD0'],['blue','하늘','#B3E5FC']];
+function getHlColor(){try{return localStorage.getItem('bible_hl_color')||'';}catch(e){return '';}}
+function setHlColorPref(c){try{localStorage.setItem('bible_hl_color',c);}catch(e){}}
 const ORIG_TRANS=['WLC','SBLGNT'];
 const AI_ENABLED=false; // AI 직역(API 키 필요) 사용 여부 — 끄면 요청도 화면도 없음
 const ORIG_REFS=[['kor','개역개정'],['saebeon','새번역'],['esv','ESV'],['NKJV','NKJV']]; // 분석 창 참고 역본
@@ -1354,17 +1493,167 @@ function hebMorph(code){
 // ── 분석 창 ──
 let origCur=null;
 function escH(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// ── 절 메뉴(길게 누르기·우클릭) ──
+function showVerseMenu(el,items,hl){
+  const m=document.getElementById('verse-menu');
+  m.innerHTML=items.map((it,i)=>`<button type="button" data-i="${i}">${it.l}</button>`).join('')+
+    `<div class="vm-hl"><span>🖍 형광펜</span>${HL_COLORS.map(([k,n,c])=>`<button type="button" class="vm-dot${hl.cur===k?' on':''}" data-c="${k}" title="${n}" style="background:${c}"></button>`).join('')}<button type="button" class="vm-dot vm-clear" data-c="x" title="지우기">✕</button></div>`;
+  m.querySelectorAll('button[data-i]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();hideVerseMenu();items[+b.dataset.i].f();});
+  m.querySelectorAll('.vm-dot').forEach(b=>b.onclick=ev=>{ev.stopPropagation();hideVerseMenu();hl.set(b.dataset.c==='x'?null:b.dataset.c);});
+  el.classList.add('vm-on');m._el=el;m._at=Date.now();
+  m.hidden=false;
+  const r=el.getBoundingClientRect(),mw=m.offsetWidth,mh=m.offsetHeight;
+  let top=r.bottom+6;if(top+mh>window.innerHeight-8)top=Math.max(8,r.top-mh-6);
+  let left=Math.min(Math.max(8,r.left+20),window.innerWidth-mw-8);
+  m.style.top=top+'px';m.style.left=left+'px';
+}
+function hideVerseMenu(){const m=document.getElementById('verse-menu');if(!m||m.hidden)return;m.hidden=true;if(m._el)m._el.classList.remove('vm-on');}
+document.addEventListener('click',e=>{const m=document.getElementById('verse-menu');if(m&&!m.hidden&&!m.contains(e.target)&&Date.now()-m._at>700)setTimeout(hideVerseMenu,0);},true); // 길게 누른 직후의 클릭은 무시
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideVerseMenu();});
+document.addEventListener('scroll',hideVerseMenu,true);
+
+// ── 짧은 알림 ──
+function toast(msg){
+  let t=document.getElementById('mini-toast');
+  if(!t){t=document.createElement('div');t.id='mini-toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1600);
+}
+// ── 공용 정보 창(메모·주석·단어 검색) ──
+function openInfo(title,html){
+  document.getElementById('info-title').textContent=title;
+  const b=document.getElementById('info-body');b.innerHTML=html;b.scrollTop=0;
+  document.getElementById('info-modal').classList.add('open');
+  return b;
+}
+function closeInfo(){document.getElementById('info-modal').classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='info-modal')closeInfo();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeInfo();});
+// ── 절 메모 ──
+function markNote(el,text){
+  if(!el)return;
+  let mk=el.querySelector('.vnote');
+  if(!text){if(mk)mk.remove();return;}
+  if(!mk){mk=document.createElement('span');mk.className='vnote';mk.textContent='📝';(el.querySelector('.vbody')||el).appendChild(mk);
+    mk.addEventListener('click',e=>{e.stopPropagation();openNote(mk._b,mk._c,mk._v,el);});}
+  const p=el.closest('.panel');const pd=panels.find(x=>x.el===p);
+  mk._b=pd?pd.getState().bookId:'';mk._c=+el.dataset.c;mk._v=+el.dataset.v;mk.title=text;
+}
+async function openNote(b,c,v,el){
+  const ref=`${BMAP[b].ko} ${c}:${v}`;
+  const body=openInfo(`절 메모 · ${ref}`,'<div class="loading">불러오는 중...</div>');
+  const notes=await notesLoad(b,c);const cur=notes[v]||'';
+  body.innerHTML=`<div class="note-verse">${escH((el?.querySelector('.vt')?.textContent)||'')}</div>
+    <textarea id="note-ta" rows="7" placeholder="이 절에 대한 묵상·메모를 적어 두세요.">${escH(cur)}</textarea>
+    <div class="note-act"><span class="note-hint">${authUser&&authAllowed?'로그인 계정에 저장(모든 기기에서 보임)':'이 기기에만 저장(로그인하면 모든 기기에서 보임)'}</span>
+    ${cur?'<button type="button" id="note-del">삭제</button>':''}<button type="button" id="note-save">저장</button></div>`;
+  const ta=document.getElementById('note-ta');setTimeout(()=>ta.focus(),50);
+  const done=async t=>{await noteSave(b,c,v,t);
+    document.querySelectorAll(`.panel`).forEach(p=>{const pd=panels.find(x=>x.el===p);if(pd&&pd.getState().bookId===b)markNote(p.querySelector(`.vi[data-c="${c}"][data-v="${v}"]`),t);});
+    closeInfo();toast(t?'메모 저장됨':'메모 삭제됨');};
+  document.getElementById('note-save').onclick=()=>done(ta.value.trim());
+  const del=document.getElementById('note-del');if(del)del.onclick=()=>{if(confirm('이 메모를 삭제할까요?'))done('');};
+}
+// ── 이 절 공유: 본문 + 그 절로 바로 여는 링크 ──
+async function shareVerse(b,c,v,trans,text){
+  const tl=(TRANS.find(t=>t.id===trans)||{l:''}).l;
+  const url=location.origin+location.pathname+'?v='+encodeURIComponent(`${b}:${c}:${v}`)+'&t='+encodeURIComponent(trans);
+  const ref=`${BMAP[b].ko} ${c}:${v}`;
+  const msg=`${ref}${tl?' ('+tl+')':''}\n${text}`;
+  try{if(navigator.share){await navigator.share({title:ref,text:msg,url});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  writeClipG(msg+'\n'+url,()=>toast('본문과 링크가 복사되었습니다'));
+}
+function writeClipG(text,done){
+  navigator.clipboard.writeText(text).then(done).catch(()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();done();});
+}
+// ── 매튜헨리 주석(그 절이 속한 단락) ──
+async function openMH(b,c,v){
+  const body=openInfo(`매튜헨리 주석 · ${BMAP[b].ko} ${c}:${v}`,'<div class="loading">불러오는 중...</div>');
+  try{
+    const secs=await fetchVerses(b,c,'mh');
+    if(!secs.length)throw new Error('이 장의 주석이 없습니다.');
+    let i=0;secs.forEach((s,j)=>{if(+s.n<=v)i=j;});
+    const show=j=>{
+      const s=secs[j];
+      body.innerHTML=`<div class="mh-nav"><button type="button" ${j>0?'':'disabled'} data-d="-1">‹ 앞 단락</button><span>${j+1} / ${secs.length}</span><button type="button" ${j<secs.length-1?'':'disabled'} data-d="1">다음 단락 ›</button></div>
+        ${s.h?`<h4 class="mh-h">${s.h}</h4>`:''}<div class="mh-t">${s.t}</div>`;
+      body.scrollTop=0;
+      body.querySelectorAll('.mh-nav button').forEach(x=>x.onclick=()=>show(j+ +x.dataset.d));
+    };
+    show(i);
+  }catch(e){body.innerHTML=`<div class="err-msg">${escH(e.message)}</div>`;}
+}
+// ── 단어 검색: 절의 단어를 골라 성경 전체 검색 ──
+function openWordSearch(text,trans,ref){
+  const words=[...new Set(text.replace(/[.,;:!?"'“”‘’()\[\]{}·…\-—]/g,' ').split(/\s+/).filter(w=>w.length>=1))];
+  const body=openInfo(`단어 검색 · ${ref}`,`<div class="ws-hint">검색할 단어를 고르세요(검색창에서 고쳐 쓸 수 있음).</div>
+    <div class="ws-chips">${words.map((w,i)=>`<button type="button" data-i="${i}">${escH(w)}</button>`).join('')}</div>`);
+  body.querySelectorAll('.ws-chips button').forEach(bt=>bt.onclick=()=>{
+    closeInfo();openSearch();
+    const sel=document.getElementById('search-trans');
+    if([...sel.options].some(o=>o.value===trans))sel.value=trans;
+    document.getElementById('search-input').value=words[+bt.dataset.i];
+    doSearch();
+  });
+}
+(function openSharedVerse(){ // ?v=책:장:절&t=역본 → 첫 창을 그 절로
+  const q=new URLSearchParams(location.search),vv=q.get('v');if(!vv)return;
+  const m=vv.match(/^([0-9a-z]+):(\d+):(\d+)$/);if(!m||!BMAP[m[1]])return;
+  const t=q.get('t');const tr=TRANS.some(x=>x.id===t)?t:null;
+  setTimeout(()=>{
+    if(!panels.length)return;
+    panels[0].setBookChapter(m[1],+m[2],tr,+m[3],true);
+    setTimeout(()=>{const el=panels[0].el.querySelector(`.vi[data-c="${m[2]}"][data-v="${m[3]}"]`);if(el){el.classList.add('vm-on');setTimeout(()=>el.classList.remove('vm-on'),2500);}},1500);
+    history.replaceState(null,'',location.pathname);
+  },400);
+})();
+
 async function openOrig(bookId,c,v,trans){
   document.getElementById('orig-modal').classList.add('open');
   const body=document.getElementById('orig-body');
   body.innerHTML='<div class="loading"><div class="spinner">✦</div><br>원어 분석 불러오는 중...</div>';
   try{
     const d=await loadOrig(bookId);
-    origCur={bookId,trans,d,key:`${c}:${v}`};
+    let key=`${c}:${v}`;
+    // 원어 창이 아니면 한글·영어 성경 절 번호 → 원어 본문 절 번호로 맞춤(예: 말 4:1 → 히 3:19)
+    if(!ORIG_TRANS.includes(trans)&&d.e){
+      const hk=Object.keys(d.e).find(k=>d.e[k]===key);
+      if(hk)key=hk;else if(d.e[key])key=null;
+    }
+    if(!key||!d.v[key]){body.innerHTML='<div class="err-msg">이 절의 원어 자료가 없습니다(사본에 따라 없는 절일 수 있음).</div>';return;}
+    origCur={bookId,trans,d,key};
     renderOrig();
   }catch(e){body.innerHTML=`<div class="err-msg">${escH(e.message)}</div>`;}
 }
-function closeOrig(){document.getElementById('orig-modal').classList.remove('open');origCur=null;}
+function closeOrig(){
+  document.getElementById('orig-modal').classList.remove('open');origCur=null;
+  if(new URLSearchParams(location.search).has('o'))history.replaceState(null,'',location.pathname); // 공유 링크로 열었으면 주소 정리
+}
+// 공유 링크: …/bible/?o=책:장:절 (원어 본문 절 번호) → 받은 사람은 바로 이 창이 열림
+function origShareURL(){
+  if(!origCur)return location.origin+location.pathname;
+  return location.origin+location.pathname+'?o='+encodeURIComponent(origCur.bookId+':'+origCur.key);
+}
+async function shareOrig(){
+  if(!origCur)return;
+  const url=origShareURL();
+  const d=origCur.d,eng=(d.e&&d.e[origCur.key])||origCur.key;
+  const title=`${BMAP[origCur.bookId].ko} ${eng} 원어 분석 · 다중 번역`;
+  const btn=document.querySelector('.orig-share');
+  try{
+    if(navigator.share){await navigator.share({title,text:title,url});return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  const done=()=>{btn.textContent='링크 복사됨 ✓';setTimeout(()=>btn.textContent='공유',1800);};
+  navigator.clipboard.writeText(url).then(done).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();done();
+  });
+}
+(function openSharedOrig(){
+  const o=new URLSearchParams(location.search).get('o');if(!o)return;
+  const m=o.match(/^([0-9a-z]+):(\d+):(\d+)$/);if(!m||!BMAP[m[1]])return;
+  const isNT=NT.some(([b])=>b===m[1]);
+  setTimeout(()=>openOrig(m[1],+m[2],+m[3],isNT?'SBLGNT':'WLC'),300);
+})();
 function origStep(dir){
   if(!origCur)return;const ks=origCur.d.keys;const i=ks.indexOf(origCur.key)+dir;
   if(i<0||i>=ks.length)return;origCur.key=ks[i];renderOrig();
@@ -1834,11 +2123,13 @@ if('serviceWorker' in navigator){
 </script>
 
 <div id="more-menu" hidden></div>
+<div id="verse-menu" hidden></div>
+<div id="info-modal"><div id="info-box"><div class="help-head"><span id="info-title"></span><button type="button" class="sync-x" onclick="closeInfo()">✕</button></div><div id="info-body"></div></div></div>
 
 <div id="orig-modal">
   <div id="orig-box">
     <div class="help-head"><span id="orig-title">원어 분석</span>
-      <span class="orig-nav"><button type="button" onclick="origStep(-1)" title="이전 절">‹</button><button type="button" onclick="origStep(1)" title="다음 절">›</button><button type="button" class="sync-x" onclick="closeOrig()">✕</button></span></div>
+      <span class="orig-nav"><button type="button" class="orig-share" onclick="shareOrig()" title="이 화면 공유">공유</button><button type="button" onclick="origStep(-1)" title="이전 절">‹</button><button type="button" onclick="origStep(1)" title="다음 절">›</button><button type="button" class="sync-x" onclick="closeOrig()">✕</button></span></div>
     <div id="orig-body"></div>
   </div>
 </div>
@@ -1879,8 +2170,8 @@ if('serviceWorker' in navigator){
       <h4>본문에서</h4>
       <table>
         <tr><th>절 누르기</th><td>형광펜을 칠하거나 지웁니다. 칠한 절이 있으면 창 상단에 ‘복사’ 버튼이 생깁니다.</td></tr>
-        <tr><th>원어 분석</th><td>히브리어·헬라어 창에서 절을 누르면 분석 창이 열립니다: 원문, 단어순 직역, 개역개정·새번역·ESV·NKJV 참고, 단어별 음역·원형·스트롱·문법 분석·뜻. 원문 단어를 누르면 해당 단어 설명으로 이동하고, ‹ ›로 앞뒤 절을 봅니다.</td></tr>
-        <tr><th>절 길게 누르기</th><td>복사 모드가 켜집니다. 고른 절은 절 번호가 붉은 원으로 표시되며, 여러 절을 눌러 고른 뒤 ‘복사’를 누릅니다.</td></tr>
+        <tr><th>원어 분석</th><td>히브리어·헬라어 창에서 절을 누르면 분석 창이 열립니다: 원문, 단어순 직역, 개역개정·새번역·ESV·NKJV 참고, 단어별 음역·원형·스트롱·문법 분석·뜻. 원문 단어를 누르면 해당 단어 설명으로 이동하고, ‹ ›로 앞뒤 절을 봅니다. ‘공유’를 누르면 이 창을 바로 여는 링크를 보낼 수 있습니다.</td></tr>
+        <tr><th>절 길게 누르기</th><td>(PC는 우클릭) 절 메뉴가 뜹니다.<br>· <b>복사</b>: 그 절 바로 복사 · <b>복사 모드</b>: 여러 절을 골라 복사<br>· <b>절 메모</b>: 메모를 적어 두면 절 끝에 📝 표시(누르면 열림). 로그인 시 모든 기기에 저장, 아니면 이 기기에만<br>· <b>이 절 공유</b>: 본문과 그 절로 바로 여는 링크 공유<br>· <b>원어 분석</b>: 어느 번역본에서든 그 절의 원어 분석·다중 번역<br>· <b>매튜헨리 주석</b>: 그 절이 속한 단락의 주석(‹ › 앞뒤 단락)<br>· <b>단어 검색</b>: 절의 단어를 골라 성경 전체 검색<br>· <b>형광펜</b>: 노랑·연두·분홍·하늘 중 선택(✕ 지우기). 고른 색은 다음 형광펜에도 쓰임<br>복사 모드에서 고른 절은 절 번호가 붉은 원으로 표시되며, 여러 절을 눌러 고른 뒤 ‘복사’를 누릅니다.</td></tr>
       </table>
       <h4>그 밖에</h4>
       <table>
@@ -1989,7 +2280,7 @@ document.getElementById('panels').addEventListener('click',function(e){
   const v=+row.dataset.v;
   const c=row.dataset.c?+row.dataset.c:st.chapter;
   setTimeout(function(){
-    if(row.classList.contains('hl')){sbSave(st.trans,st.bookId,c,v);}
+    if(row.classList.contains('hl')){sbSave(st.trans,st.bookId,c,v,row.dataset.hc||'');}
     else{sbDel(st.trans,st.bookId,c,v);}
   },0);
 },true);
