@@ -171,6 +171,9 @@ body.dark #search-status{color:#8a949e}
 #search-results::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:2px}
 .sr-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid #f3f4f6;transition:background 0.1s}
 .sr-item:hover{background:#f9fafb}
+.sr-item.kb{background:#eef2ff;box-shadow:inset 3px 0 0 #4f46e5}
+body.dark .sr-item.kb,body.dark2 .sr-item.kb{background:#24304a;box-shadow:inset 3px 0 0 #8fb0e6}
+body.bright2 .sr-item.kb{background:#ede4d0;box-shadow:inset 3px 0 0 #8a6030}
 body.dark .sr-item{border-color:#23272c}
 body.dark .sr-item:hover{background:#24304a}
 .sr-ref{font-size:11px;font-weight:700;color:#6366f1;margin-bottom:3px;letter-spacing:0.5px}
@@ -1964,10 +1967,41 @@ function closeSearch(){
   document.getElementById('search-modal').classList.remove('open');
 }
 
+// ── 키보드: Ctrl+F(⌘F) = 앱 검색창, 결과는 ↑↓로 이동하고 Enter로 열기 ──
+function srItems(){return [...document.querySelectorAll('#search-results .sr-item')];}
+function srMove(d){
+  const it=srItems();if(!it.length)return;
+  let i=it.findIndex(x=>x.classList.contains('kb'));
+  if(i>=0)it[i].classList.remove('kb');
+  i=i<0?(d>0?0:it.length-1):Math.min(it.length-1,Math.max(0,i+d));
+  it[i].classList.add('kb');it[i].scrollIntoView({block:'nearest'});
+}
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') closeSearch();
-  if(e.key==='Enter'&&document.getElementById('search-modal').classList.contains('open')) doSearch();
+  const open=document.getElementById('search-modal').classList.contains('open');
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='f'||e.key==='F')){
+    e.preventDefault(); // 크롬 찾기 대신 앱 검색창
+    const selTxt=(window.getSelection?String(window.getSelection()):'').trim().slice(0,40);
+    if(!open)openSearch();
+    const inp=document.getElementById('search-input');
+    if(selTxt){inp.value=selTxt;doSearch();}
+    setTimeout(()=>{inp.focus();inp.select();},120);
+    return;
+  }
+  if(!open){if(e.key==='Escape')closeSearch();return;}
+  if(e.key==='Escape'){closeSearch();return;}
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    if(e.target&&e.target.id==='search-trans')return; // 역본 선택 상자는 그대로
+    if(srItems().length){e.preventDefault();srMove(e.key==='ArrowDown'?1:-1);}
+    return;
+  }
+  if(e.key==='Enter'){
+    const cur=document.querySelector('#search-results .sr-item.kb');
+    if(cur){e.preventDefault();cur.click();}   // 고른 결과 = 클릭과 동일
+    else doSearch();
+  }
 });
+// 검색어를 고치면 결과 선택 해제(Enter = 다시 검색)
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='search-input')document.querySelectorAll('#search-results .sr-item.kb').forEach(x=>x.classList.remove('kb'));});
 // 검색창 바깥(어두운 배경) 클릭 시 닫기 — search-modal이 이 스크립트보다 뒤에 있어 document에 위임
 document.addEventListener('click',e=>{
   if(e.target&&e.target.id==='search-modal') closeSearch();
@@ -2149,7 +2183,7 @@ if('serviceWorker' in navigator){
     <div class="help-body">
       <h4>상단 메뉴</h4>
       <table>
-        <tr><th>🔍 검색</th><td>개역개정·새번역·ESV·NIV에서 단어를 찾습니다. 결과를 누르면 첫 번째 창에서 그 절로 이동합니다. 성경 이름·약어를 넣으면(예: 시87, 고전2:12, 눅, 마태) 맨 위에 ‘바로 가기’가 나옵니다.</td></tr>
+        <tr><th>🔍 검색</th><td>PC에서는 Ctrl+F(맥 ⌘F)로도 열립니다(본문에서 글자를 드래그해 두면 그 글자로 바로 검색). 결과는 ↑↓로 고르고 Enter로 엽니다. 개역개정·새번역·ESV·NIV에서 단어를 찾습니다. 결과를 누르면 첫 번째 창에서 그 절로 이동합니다. 성경 이름·약어를 넣으면(예: 시87, 고전2:12, 눅, 마태) 맨 위에 ‘바로 가기’가 나옵니다.</td></tr>
         <tr><th>색상 모드</th><td>Bright · Bright2 · Dark1 · Dark2 중 선택. ‘시스템 설정 사용’은 기기 설정에 따라 Bright2/Dark2로 바뀝니다. 기기마다 따로 기억합니다.</td></tr>
         <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고, 읽을 범위의 시작과 끝에 붉은 선이 표시됩니다(시작선 오른쪽에 [날짜 매일성경]).</td></tr>
         <tr><th>로그인</th><td>Google 계정으로 로그인합니다. 허용된 계정만 쓸 수 있고, 로그인해야 형광펜이 저장됩니다.</td></tr>
