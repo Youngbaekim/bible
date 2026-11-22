@@ -942,6 +942,20 @@ function applyGlobal(){
 
 let pid=0;const panels=[];
 
+function activePanel(){
+  if(!panels.length) return null;
+  const wrap=document.getElementById('panels-wrap');
+  if(!wrap) return panels[0];
+  const w=wrap.getBoundingClientRect();
+  let best=panels[0], bestVis=-1;
+  panels.forEach(p=>{
+    const r=p.el.getBoundingClientRect();
+    const vis=Math.max(0, Math.min(r.right,w.right)-Math.max(r.left,w.left));
+    if(vis>=bestVis){ bestVis=vis; best=p; }
+  });
+  return best;
+}
+
 const MAX_PANELS=10;
 function createPanel(initBook='john', initChapter=3, initTrans='kor', force=false){
   if(panels.length>=MAX_PANELS)return; // 창은 최대 10개
@@ -1947,7 +1961,7 @@ function openSearch(){
     .map(t=>`<option value="${t.id}">${t.l}</option>`).join('');
   // Default to first panel's trans if available
   if(panels.length>0){
-    const pt=panels[0].getState().trans;
+    const pt=(activePanel()||panels[0]).getState().trans;
     if(LOCAL_TRANS.includes(pt)) sel.value=pt;
   }
   document.getElementById('search-input').value='';
@@ -2027,7 +2041,8 @@ function wireRefJumps(resultsEl,refs){
   resultsEl.querySelectorAll('.sr-jump').forEach(el=>{
     el.onclick=()=>{
       const r=refs[+el.dataset.j];
-      if(panels.length>0)panels[0].setBookChapter(r.bookId,r.ch,null,r.v,true);
+      const ap=activePanel();
+      if(ap) ap.setBookChapter(r.bookId,r.ch,null,r.v,true);
       closeSearch();
     };
   });
@@ -2105,8 +2120,9 @@ async function doSearch(){
     el.onclick=()=>{
       const {bookId,ch,v}=results[+el.dataset.i];
       const transId=document.getElementById('search-trans').value;
-      if(panels.length>0){
-        panels[0].setBookChapter(bookId,ch,transId,v);
+      const ap=activePanel();
+      if(ap){
+        ap.setBookChapter(bookId,ch,transId,v);
       }
       closeSearch();
     };
