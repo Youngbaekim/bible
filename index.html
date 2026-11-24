@@ -567,8 +567,19 @@ body.dark .pr-cm,body.dark2 .pr-cm{border-color:#8fb0e6;color:#8fb0e6}
 body.bright2 .pr-cm{border-color:#8a6030;color:#8a6030}
 #cm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2100;align-items:flex-start;justify-content:center;padding:30px 0 12px}
 #cm-modal.open{display:flex}
-#cm-box{background:#fff;border-radius:12px;width:min(820px,96vw);height:calc(100vh - 42px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
-#cm-frame{flex:1;width:100%;border:none;background:#fff}
+#cm-box{background:#fff;border-radius:12px;width:min(720px,96vw);max-height:calc(100vh - 42px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+#cm-body{flex:1;overflow:auto;padding:6px 20px 20px;font-size:15px;line-height:1.8;word-break:keep-all}
+#cm-body .cm-meta{font-size:12px;color:#6b7280;margin:10px 0 2px}
+#cm-body .cm-t{font-size:19px;font-weight:700;margin:2px 0 4px}
+#cm-body .cm-ref{font-size:13px;color:#4b5563;padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;margin:6px 0 12px}
+#cm-body .cm-b{margin:0 0 12px}
+#cm-body .cm-g{font-weight:700;color:#4f46e5;margin:18px 0 6px}
+#cm-body .cm-p{white-space:pre-line;margin:0 0 10px}
+#cm-body .cm-msg{color:#6b7280;text-align:center;padding:40px 0}
+body.dark #cm-body .cm-g,body.dark2 #cm-body .cm-g{color:#8fb0e6}
+body.dark #cm-body .cm-ref,body.dark2 #cm-body .cm-ref{border-color:#3a4048;color:#aab3bd}
+body.bright2 #cm-body .cm-g{color:#8a6030}
+body.bright2 #cm-body .cm-ref{border-color:#d4c4a0}
 #cm-box .cm-btn{border:1px solid #d1d5db;background:transparent;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;margin-right:6px;font-family:inherit;color:inherit}
 .cm-foot{font-size:11px;color:#9ca3af;text-align:center;padding:6px 10px;border-top:1px solid #e5e7eb}
 body.dark #cm-box,body.dark2 #cm-box{background:#1b1e22;border:1px solid #3a4048;color:#d5dade}
@@ -1790,25 +1801,32 @@ function openPlan(){
   document.getElementById('plan-modal').classList.add('open');
 }
 function closePlan(){document.getElementById('plan-modal').classList.remove('open');}
-// ── 매일성경 해설: 성서유니온 공식 '오늘의 묵상' 페이지를 띄움(오늘=앱 안 팝업, 다른 날=새 창) ──
-// 해설 본문은 앱이 복사·저장하지 않음(성서유니온 저작권 안내: 전재·단체 배포 금지). 페이지는 성서유니온 서버가 직접 보여 줌.
+// ── 매일성경 해설: Edge Function(dailybible)으로 해설 본문만 받아 팝업에 표시(개인 열람용) ──
 const CM_URL='https://sum.su.or.kr:8888/bible/today';
 const cmUrl=date=>`${CM_URL}?qt_ty=QT1&base_de=${date}#bibleTab`; // #bibleTab: 읽기표·본문·해설 탭 위치로 바로 이동
-let cmDate='';
-function openCM(y,m,d,txt){
+let cmDate='',cmSeq=0;
+// 해설 본문은 Edge Function(dailybible)이 공식 페이지에서 읽어 옴 — 저장 없음, OWNER_EMAILS 계정만 열람
+async function openCM(y,m,d,txt){
   if(!(authUser&&authAllowed))return;
   cmDate=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  const t=new Date(),isToday=(t.getFullYear()===y&&t.getMonth()+1===m&&t.getDate()===d);
-  // 팝업(iframe) 안에서는 성서유니온 사이트가 날짜 지정을 받지 않고 늘 오늘 것을 보여 줌 → 오늘이 아닌 날은 새 창으로 엶
-  if(!isToday){window.open(cmUrl(cmDate),'_blank','noopener');return;}
   document.getElementById('cm-title').textContent=`매일성경 해설 · ${m}/${d} ${txt}`;
+  const body=document.getElementById('cm-body');
+  body.innerHTML='<div class="cm-msg">해설을 불러오는 중…</div>';body.scrollTop=0;
   document.getElementById('cm-modal').classList.add('open');
-  document.getElementById('cm-frame').src=cmUrl(cmDate);
+  const my=++cmSeq;
+  try{
+    const res=await fetch(SB_URL+'/functions/v1/dailybible',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+authToken,'Content-Type':'application/json'},body:JSON.stringify({date:cmDate})});
+    const j=await res.json().catch(()=>({error:'응답 오류 '+res.status}));
+    if(my!==cmSeq)return;
+    if(!res.ok||j.error){body.innerHTML=`<div class="cm-msg">${escH(j.error||('오류 '+res.status))}<br><small>‘새 창’으로 공식 페이지를 열 수 있습니다.</small></div>`;return;}
+    body.innerHTML=(j.day?`<div class="cm-meta">${escH(j.day)}</div>`:'')+(j.title?`<div class="cm-t">${escH(j.title)}</div>`:'')+(j.ref?`<div class="cm-ref">${escH(j.ref)}</div>`:'')+
+      j.blocks.map(b=>`<div class="cm-${b.k}">${escH(b.t)}</div>`).join('');
+  }catch(e){if(my===cmSeq)body.innerHTML=`<div class="cm-msg">불러오지 못했습니다: ${escH(e.message)}</div>`;}
 }
 function cmNewWin(){if(cmDate)window.open(cmUrl(cmDate),'_blank','noopener');}
 function closeCM(){
   const m=document.getElementById('cm-modal');if(!m.classList.contains('open'))return;
-  m.classList.remove('open');document.getElementById('cm-frame').src='about:blank';
+  m.classList.remove('open');cmSeq++;
 }
 document.addEventListener('click',e=>{if(e.target&&e.target.id==='cm-modal')closeCM();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCM();});
@@ -2236,8 +2254,8 @@ if('serviceWorker' in navigator){
 <div id="cm-modal">
   <div id="cm-box">
     <div class="help-head"><span id="cm-title">매일성경 해설</span><span><button type="button" class="cm-btn" onclick="cmNewWin()" title="공식 페이지를 새 창으로">새 창</button><button type="button" class="sync-x" onclick="closeCM()">✕</button></span></div>
-    <iframe id="cm-frame" name="cm-frame" title="성서유니온 매일성경" referrerpolicy="no-referrer"></iframe>
-    <div class="cm-foot">성서유니온 매일성경 공식 페이지입니다 · 위쪽 <b>해설</b> 탭을 누르세요 · 해설 저작권: 성서유니온</div>
+    <div id="cm-body"></div>
+    <div class="cm-foot">출처: 성서유니온 매일성경 해설 · 개인 열람용</div>
   </div>
 </div>
 
@@ -2249,7 +2267,7 @@ if('serviceWorker' in navigator){
       <table>
         <tr><th>🔍 검색</th><td>PC에서는 Ctrl+F(맥 ⌘F)로도 열립니다(본문에서 글자를 드래그해 두면 그 글자로 바로 검색). 결과는 ↑↓로 고르고 Enter로 엽니다. 개역개정·새번역·ESV·NIV에서 단어를 찾습니다. 결과를 누르면 첫 번째 창에서 그 절로 이동합니다. 성경 이름·약어를 넣으면(예: 시87, 고전2:12, 눅, 마태) 맨 위에 ‘바로 가기’가 나옵니다.</td></tr>
         <tr><th>색상 모드</th><td>Bright · Bright2 · Dark1 · Dark2 중 선택. ‘시스템 설정 사용’은 기기 설정에 따라 Bright2/Dark2로 바뀝니다. 기기마다 따로 기억합니다.</td></tr>
-        <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고, 읽을 범위의 시작과 끝에 붉은 선이 표시됩니다(시작선 오른쪽에 [날짜 매일성경]). 로그인하면 날짜 옆에 <b>해설</b> 단추가 생기며, 누르면 성서유니온 공식 해설 페이지가 열립니다. 오늘 날짜는 앱 안 팝업으로, 다른 날짜는 새 창으로 열립니다(해설은 성서유니온 사이트가 직접 보여 줌, 위쪽 '해설' 탭 선택).</td></tr>
+        <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고, 읽을 범위의 시작과 끝에 붉은 선이 표시됩니다(시작선 오른쪽에 [날짜 매일성경]). 로그인하면 날짜 옆에 <b>해설</b> 단추가 생기며, 누르면 그날의 성서유니온 해설 본문이 팝업으로 열립니다(PC·모바일 공통, 개인 열람용). ‘새 창’은 공식 페이지를 엽니다.</td></tr>
         <tr><th>로그인</th><td>Google 계정으로 로그인합니다. 허용된 계정만 쓸 수 있고, 로그인해야 형광펜이 저장됩니다.</td></tr>
       </table>
       <h4>보기 설정</h4>
