@@ -560,6 +560,19 @@ body.bright2 #more-menu button:active,body.bright2 #more-menu button:hover{backg
 /* ── 장 이어 보기 ── */
 .panel-text{position:relative;overflow-anchor:none} /* 앞 장 붙일 때 위치 보정은 직접 처리 */
 .ch-block+.ch-block{margin-top:var(--chgap,77px)} /* 장과 장 사이 본문 3줄 높이 */
+/* ── 매일성경 해설 단추·팝업(공식 페이지를 그대로 띄움, 본문 복사 없음) ── */
+.pr-cm{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;border:1px solid #4f46e5;color:#4f46e5;background:transparent;white-space:nowrap}
+.pr-cm:hover{background:#4f46e5;color:#fff}
+body.dark .pr-cm,body.dark2 .pr-cm{border-color:#8fb0e6;color:#8fb0e6}
+body.bright2 .pr-cm{border-color:#8a6030;color:#8a6030}
+#cm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2100;align-items:flex-start;justify-content:center;padding:30px 0 12px}
+#cm-modal.open{display:flex}
+#cm-box{background:#fff;border-radius:12px;width:min(820px,96vw);height:calc(100vh - 42px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Noto Sans KR',sans-serif;color:#111827;overflow:hidden}
+#cm-frame{flex:1;width:100%;border:none;background:#fff}
+#cm-box .cm-btn{border:1px solid #d1d5db;background:transparent;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;margin-right:6px;font-family:inherit;color:inherit}
+.cm-foot{font-size:11px;color:#9ca3af;text-align:center;padding:6px 10px;border-top:1px solid #e5e7eb}
+body.dark #cm-box,body.dark2 #cm-box{background:#1b1e22;border:1px solid #3a4048;color:#d5dade}
+body.bright2 #cm-box{background:#f8f3ea;border:1px solid #c4b08a;color:#3d2b1a}
 /* ── 매일성경 범위 표시선 ── */
 .rp-line{position:relative;height:0;border-top:2px solid #f03e3e;margin:10px 0 8px;clear:both}
 .rp-tag{position:absolute;right:0;bottom:3px;font-size:11px;font-weight:700;color:#f03e3e;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;line-height:1}
@@ -1777,6 +1790,28 @@ function openPlan(){
   document.getElementById('plan-modal').classList.add('open');
 }
 function closePlan(){document.getElementById('plan-modal').classList.remove('open');}
+// ── 매일성경 해설: 성서유니온 공식 '오늘의 묵상' 페이지를 띄움(오늘=앱 안 팝업, 다른 날=새 창) ──
+// 해설 본문은 앱이 복사·저장하지 않음(성서유니온 저작권 안내: 전재·단체 배포 금지). 페이지는 성서유니온 서버가 직접 보여 줌.
+const CM_URL='https://sum.su.or.kr:8888/bible/today';
+const cmUrl=date=>`${CM_URL}?qt_ty=QT1&base_de=${date}#bibleTab`; // #bibleTab: 읽기표·본문·해설 탭 위치로 바로 이동
+let cmDate='';
+function openCM(y,m,d,txt){
+  if(!(authUser&&authAllowed))return;
+  cmDate=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const t=new Date(),isToday=(t.getFullYear()===y&&t.getMonth()+1===m&&t.getDate()===d);
+  // 팝업(iframe) 안에서는 성서유니온 사이트가 날짜 지정을 받지 않고 늘 오늘 것을 보여 줌 → 오늘이 아닌 날은 새 창으로 엶
+  if(!isToday){window.open(cmUrl(cmDate),'_blank','noopener');return;}
+  document.getElementById('cm-title').textContent=`매일성경 해설 · ${m}/${d} ${txt}`;
+  document.getElementById('cm-modal').classList.add('open');
+  document.getElementById('cm-frame').src=cmUrl(cmDate);
+}
+function cmNewWin(){if(cmDate)window.open(cmUrl(cmDate),'_blank','noopener');}
+function closeCM(){
+  const m=document.getElementById('cm-modal');if(!m.classList.contains('open'))return;
+  m.classList.remove('open');document.getElementById('cm-frame').src='about:blank';
+}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='cm-modal')closeCM();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCM();});
 function planShift(d){
   let y=planY,m=planM+d;
   if(m<1){m=12;y--;} if(m>12){m=1;y++;}
@@ -1794,13 +1829,18 @@ function renderPlan(scrollToday){
      <button type="button" class="pn-side" ${hasNext?'':'disabled'} onclick="planShift(1)">${nm}월</button>`;
   const list=RP_DATA[planY][planM]||[];
   const t=new Date(),W=['일','월','화','수','목','금','토'];
+  const cmOK=!!(authUser&&authAllowed); // 해설 단추: 로그인(등록 계정)한 경우에만
   document.getElementById('plan-list').innerHTML=list.map((txt,i)=>{
     const d=i+1,dt=new Date(planY,planM-1,d),w=dt.getDay();
     const today=(t.getFullYear()===planY&&t.getMonth()+1===planM&&t.getDate()===d);
     return `<button type="button" class="plan-row${today?' today':''}${w===0?' sun':''}" data-i="${i}">
-      <span class="pr-d">${d}</span><span class="pr-w">${W[w]}</span><span class="pr-t">${txt}</span>${today?'<span class="pr-tag">오늘</span>':''}</button>`;
+      <span class="pr-d">${d}</span><span class="pr-w">${W[w]}</span><span class="pr-t">${txt}</span>${today?'<span class="pr-tag">오늘</span>':''}${cmOK?'<span class="pr-cm" role="button" title="성서유니온 매일성경 해설">해설</span>':''}</button>`;
   }).join('');
-  document.querySelectorAll('#plan-list .plan-row').forEach(b=>b.onclick=()=>openPlanDay(list[+b.dataset.i],planY,planM,+b.dataset.i+1));
+  document.querySelectorAll('#plan-list .plan-row').forEach(b=>b.onclick=e=>{
+    const i=+b.dataset.i;
+    if(e.target.closest('.pr-cm')){e.stopPropagation();openCM(planY,planM,i+1,list[i]);return;}
+    openPlanDay(list[i],planY,planM,i+1);
+  });
   const box=document.getElementById('plan-list');
   const td=box.querySelector('.today');
   if(scrollToday&&td)setTimeout(()=>td.scrollIntoView({block:'center'}),30); else box.scrollTop=0;
@@ -2193,6 +2233,14 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<div id="cm-modal">
+  <div id="cm-box">
+    <div class="help-head"><span id="cm-title">매일성경 해설</span><span><button type="button" class="cm-btn" onclick="cmNewWin()" title="공식 페이지를 새 창으로">새 창</button><button type="button" class="sync-x" onclick="closeCM()">✕</button></span></div>
+    <iframe id="cm-frame" name="cm-frame" title="성서유니온 매일성경" referrerpolicy="no-referrer"></iframe>
+    <div class="cm-foot">성서유니온 매일성경 공식 페이지입니다 · 위쪽 <b>해설</b> 탭을 누르세요 · 해설 저작권: 성서유니온</div>
+  </div>
+</div>
+
 <div id="help-modal">
   <div id="help-box">
     <div class="help-head"><span>1426 다본문 성경 · 사용 안내</span><button type="button" class="sync-x" onclick="closeHelp()">✕</button></div>
@@ -2201,7 +2249,7 @@ if('serviceWorker' in navigator){
       <table>
         <tr><th>🔍 검색</th><td>PC에서는 Ctrl+F(맥 ⌘F)로도 열립니다(본문에서 글자를 드래그해 두면 그 글자로 바로 검색). 결과는 ↑↓로 고르고 Enter로 엽니다. 개역개정·새번역·ESV·NIV에서 단어를 찾습니다. 결과를 누르면 첫 번째 창에서 그 절로 이동합니다. 성경 이름·약어를 넣으면(예: 시87, 고전2:12, 눅, 마태) 맨 위에 ‘바로 가기’가 나옵니다.</td></tr>
         <tr><th>색상 모드</th><td>Bright · Bright2 · Dark1 · Dark2 중 선택. ‘시스템 설정 사용’은 기기 설정에 따라 Bright2/Dark2로 바뀝니다. 기기마다 따로 기억합니다.</td></tr>
-        <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고, 읽을 범위의 시작과 끝에 붉은 선이 표시됩니다(시작선 오른쪽에 [날짜 매일성경]).</td></tr>
+        <tr><th>매일성경</th><td>성서유니온 매일성경 읽기표(2024~2027년)를 월별로 보여 줍니다. 처음엔 오늘 날짜가 표시되고, ‹ › 또는 이전·다음 달 이름으로 달을 옮깁니다. 날짜를 누르면 그 본문이 새 창으로 열리고, 읽을 범위의 시작과 끝에 붉은 선이 표시됩니다(시작선 오른쪽에 [날짜 매일성경]). 로그인하면 날짜 옆에 <b>해설</b> 단추가 생기며, 누르면 성서유니온 공식 해설 페이지가 열립니다. 오늘 날짜는 앱 안 팝업으로, 다른 날짜는 새 창으로 열립니다(해설은 성서유니온 사이트가 직접 보여 줌, 위쪽 '해설' 탭 선택).</td></tr>
         <tr><th>로그인</th><td>Google 계정으로 로그인합니다. 허용된 계정만 쓸 수 있고, 로그인해야 형광펜이 저장됩니다.</td></tr>
       </table>
       <h4>보기 설정</h4>
